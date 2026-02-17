@@ -9,7 +9,7 @@ module ethernet_top (
     input logic rx0,                    // The data on the first receiving pin
     input logic rx1,                    // The data on the second receiving pin
 
-    output logic tx_en,                  // TX enable pin, drive to low to prevent FPGA transmission
+    output logic tx_en,                 // TX enable pin, drive to low to prevent FPGA transmission
 
     output logic [7:0] payload,         // The payload data
     output logic payload_valid,         // Whether we are currently receiving payload data
