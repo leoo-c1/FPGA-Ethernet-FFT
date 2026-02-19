@@ -40,7 +40,7 @@ std::vector<int16_t> readWAVFile(string filename) {
     // If it isn't open, return an error
     if (!is.is_open()) {
         cout << "Could not open the wav file" << std::endl;
-        return;
+        return {};
     }
 
     // Get length of the wav file
