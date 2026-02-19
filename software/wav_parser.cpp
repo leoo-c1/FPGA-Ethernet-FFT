@@ -104,6 +104,21 @@ vector<int16_t> readWAVFile(string filename) {
 }
 
 int main() {
-    readWAVFile("../audio/example_wav_mono.wav");
-}
+    vector<int16_t> audio_track = readWAVFile("../audio/example_wav_mono.wav");
 
+    // Check if the function failed and returned an empty vector
+    if (audio_track.empty()) {
+        cout << "Error: Could not read the wav file" << endl;
+        return 1;
+    }
+
+    cout << "Loaded " << audio_track.size() << " samples into memory" << endl;
+    
+    // Print the first 10 samples to test
+    cout << "First 10 samples: " << endl;
+    for (int i = 0; i < 10 && i < audio_track.size(); i++) {
+        cout << audio_track[i] << endl;
+    }
+
+    return 0;
+}
