@@ -112,6 +112,8 @@ vector<int16_t> readWAVFile(string filename) {
         is.seekg(current_chunk_size, ios::cur);
     }
 
+    current_chunk_size = file_length - (int)is.tellg();
+
     // With 16-bit audio, there are 2 bytes for every sample
     int num_samples = current_chunk_size / 2;
     // Create vector to hold audio data
@@ -138,9 +140,9 @@ int main() {
 
     cout << "Loaded " << audio_track.size() << " samples into memory" << endl;
     
-    // Print the first 10 samples to test
-    cout << "First 10 samples: " << endl;
-    for (int i = 0; i < 10 && i < audio_track.size(); i++) {
+    // Print the first 100 samples to test
+    cout << "First 100 samples: " << endl;
+    for (int i = 0; i < 100 && i < audio_track.size(); i++) {
         cout << audio_track[i] << endl;
     }
 
