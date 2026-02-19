@@ -1,3 +1,4 @@
+#include "WavParser.h"
 #include <array>
 #include <vector>
 #include <iostream>
@@ -7,36 +8,21 @@
 #include <cstring>
 
 using namespace std;
-ifstream is;
 
-int file_length{0};
+WavParser::WavParser(const string& file_path) {
+    filename = file_path;
+    file_length = 0;
+}
 
-struct __attribute__((packed)) wav_header {
-    // RIFF chunk descriptor
-    char chunk_id[4]{};                 // 'RIFF', 4 characters
-    uint32_t chunk_size{0};             // 4 bytes for size of the rest of the file after this
-    char format[4]{};                   // 'WAVE', 4 characters
-
-    // fmt chunk
-    char fmt_id[4]{};                   // 'fmt ', 4 characters (including space)
-    uint32_t fmt_size{};                // Size of the rest of the fmt chunk after this    
-    uint16_t audio_format{};            // Audio format, should equal 1 for PCM
-    uint16_t num_channels{};            // Mono = 1, stereo = 2
-    uint32_t sample_rate{};             // Sample rate in hertz, such as 8000 or 44.1k
-    uint32_t byte_rate{};               // = SampleRate * NumChannels * BitsPerSample/8
-    uint16_t block_align{};             // = NumChannels * BitsPerSample/8
-    uint16_t bits_per_sample{};         // Bit depth, 8-bit = 8, 16-bit = 16, etc
-};
-
-vector<int16_t> readWAVFile(string filename) {
+bool WavParser::parse() {
     // Open the wav file
     cout << "Opening wav file..." << endl;
-    is.open(filename, ios::binary);
+    ifstream is(filename, ios::binary);
 
     // If it isn't open, return an error
     if (!is.is_open()) {
         cout << "Could not open the wav file" << endl;
-        return {};
+        return false;
     }
 
     // Get length of the wav file
@@ -52,35 +38,35 @@ vector<int16_t> readWAVFile(string filename) {
 
     if (strncmp(header.chunk_id, "RIFF", 4) != 0) {
         cout << "Error: Did not receive chunk ID 'RIFF'" << endl;
-        return {};
+        return false;
     }
     if (strncmp(header.format, "WAVE", 4) != 0) {
         cout << "Error: Did not receive format 'WAVE'" << endl;
-        return {};
+        return false;
     }
     if (strncmp(header.fmt_id, "fmt ", 4) != 0) {
         cout << "Error: Did not receive fmt ID 'fmt '" << endl;
-        return {};
+        return false;
     }
     if (header.audio_format != 1) {
         cout << "Error: Audio format is not PCM" << endl;
-        return {};
+        return false;
     }
     if (header.num_channels != 1) {
         cout << "Error: Audio is not mono" << endl;
-        return {};
+        return false;
     }
     if (header.byte_rate != (header.sample_rate * header.num_channels * header.bits_per_sample/8)) {
         cout << "Error: Invalid byte rate" << endl;
-        return {};
+        return false;
     }
     if (header.block_align != (header.num_channels * header.bits_per_sample/8)) {
         cout << "Error: Invalid block align" << endl;
-        return {};
+        return false;
     }
     if (header.bits_per_sample != 16) {
         cout << "Error: Bit depth is not 16-bit" << endl;
-        return {};
+        return false;
     }
 
     // Skip any extra bytes in the fmt chunk if it's larger than 16 bytes
@@ -100,7 +86,7 @@ vector<int16_t> readWAVFile(string filename) {
         // Return an error if we hit the end of the file without finding the data chunk
         if (is.eof()) {
             cout << "Error: Reached end of file without finding data chunk" << endl;
-            return {};
+            return false;
         }
 
         // Check if the chunk ID is 'data'
@@ -116,8 +102,8 @@ vector<int16_t> readWAVFile(string filename) {
 
     // With 16-bit audio, there are 2 bytes for every sample
     int num_samples = current_chunk_size / 2;
-    // Create vector to hold audio data
-    vector<int16_t> audio_data(num_samples);
+    // Resize class object audio_data to fit num_samples
+    audio_data.resize(num_samples);
 
     // Read the audio data
     is.read(reinterpret_cast<char*>(audio_data.data()), current_chunk_size);
@@ -126,25 +112,10 @@ vector<int16_t> readWAVFile(string filename) {
     cout << "Finished reading wav file" << endl;
     is.close();
 
-    return audio_data;
+    return true;
 }
 
-int main() {
-    vector<int16_t> audio_track = readWAVFile("../audio/example_wav_mono.wav");
-
-    // Check if the function failed and returned an empty vector
-    if (audio_track.empty()) {
-        cout << "Error: Could not read the wav file" << endl;
-        return 1;
-    }
-
-    cout << "Loaded " << audio_track.size() << " samples into memory" << endl;
-    
-    // Print the first 100 samples to test
-    cout << "First 100 samples: " << endl;
-    for (int i = 0; i < 100 && i < audio_track.size(); i++) {
-        cout << audio_track[i] << endl;
-    }
-
-    return 0;
+// Getter function for main.cpp to access the parsed data
+const vector<int16_t>& WavParser::getAudioData() const {
+    return audio_data;
 }
