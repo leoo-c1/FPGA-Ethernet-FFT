@@ -33,7 +33,7 @@ struct __attribute__((packed)) wav_header {
     uint32_t data_size{};               // = NumSamples * NumChannels * BitsPerSample/8
 };
 
-void readWAVFile(string filename) {
+std::vector<int16_t> readWAVFile(string filename) {
     // Open the wav file
     is.open(filename, ios::binary);
 
@@ -93,6 +93,8 @@ void readWAVFile(string filename) {
 
     // Read the audio data
     is.read(reinterpret_cast<char*>(audio_data.data()), header.data_size);
+
+    return audio_data;
 }
 
 int main() {
