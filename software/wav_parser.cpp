@@ -55,35 +55,35 @@ std::vector<int16_t> readWAVFile(string filename) {
 
     if (strncmp(header.chunk_id, "RIFF", 4) != 0) {
         std::cout << "Error: Did not receive chunk ID 'RIFF'" << std::endl;
-        return;
+        return {};
     }
     if (strncmp(header.format, "WAVE", 4) != 0) {
         std::cout << "Error: Did not receive format 'WAVE'" << std::endl;
-        return;
+        return {};
     }
     if (strncmp(header.fmt_id, "fmt ", 4) != 0) {
         std::cout << "Error: Did not receive fmt ID 'fmt '" << std::endl;
-        return;
+        return {};
     }
     if (header.audio_format != 1) {
         std::cout << "Error: Audio format is not PCM" << std::endl;
-        return;
+        return {};
     }
     if (header.num_channels != 1) {
         std::cout << "Error: Audio is not mono" << std::endl;
-        return;
+        return {};
     }
     if (header.byte_rate != (header.sample_rate * header.num_channels * header.bits_per_sample/8)) {
         std::cout << "Error: Invalid byte rate" << std::endl;
-        return;
+        return {};
     }
     if (header.block_align != (header.num_channels * header.bits_per_sample/8)) {
         std::cout << "Error: Invalid block align" << std::endl;
-        return;
+        return {};
     }
     if (header.bits_per_sample != 16) {
         std::cout << "Error: Bit depth is not 16-bit" << std::endl;
-        return;
+        return {};
     }
 
     // With 16-bit audio, there are 2 bytes for every sample
