@@ -78,6 +78,14 @@ void readWAVFile(string filename) {
         std::cout << "Error: Audio is not mono" << std::endl;
         return;
     }
+    if (header.byte_rate != (header.sample_rate * header.num_channels * header.bits_per_sample/8)) {
+        std::cout << "Error: Invalid byte rate" << std::endl;
+        return;
+    }
+    if (header.block_align != (header.num_channels * header.bits_per_sample/8)) {
+        std::cout << "Error: Invalid block align" << std::endl;
+        return;
+    }
     if (header.bits_per_sample != 16) {
         std::cout << "Error: Bit depth is not 16-bit" << std::endl;
         return;
