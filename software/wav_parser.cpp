@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
+#include <cstring>
 
 using namespace std;
 ifstream is;
@@ -32,10 +33,6 @@ struct __attribute__((packed)) wav_header {
     uint32_t data_size{};               // = NumSamples * NumChannels * BitsPerSample/8
 };
 
-char expected_chunk_id[4]{'R', 'I', 'F', 'F'};
-char expected_format[4]{'W', 'A', 'V', 'E'};
-char expected_fmt_id[4]{'f', 'm', 't', ' '};
-
 void readWAVFile(string filename) {
     // Open the wav file
     is.open(filename, ios::binary);
@@ -56,15 +53,15 @@ void readWAVFile(string filename) {
      // Read from the file
     is.read(reinterpret_cast<char*>(&header), sizeof(wav_header));
 
-    if (header.chunk_id != expected_chunk_id) {
+    if (strncmp(header.chunk_id, "RIFF", 4) != 0) {
         std::cout << "Error: Did not receive chunk ID 'RIFF'" << std::endl;
         return;
     }
-    if (header.format != expected_format) {
+    if (strncmp(header.format, "WAVE", 4) != 0) {
         std::cout << "Error: Did not receive format 'WAVE'" << std::endl;
         return;
     }
-    if (header.fmt_id != expected_fmt_id) {
+    if (strncmp(header.fmt_id, "fmt ", 4) != 0) {
         std::cout << "Error: Did not receive fmt ID 'fmt '" << std::endl;
         return;
     }
