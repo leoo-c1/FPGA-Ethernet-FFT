@@ -56,8 +56,6 @@ void readWAVFile(string filename) {
      // Read from the file
     is.read(reinterpret_cast<char*>(&header), sizeof(wav_header));
 
-    char expected_chunk_id[4]{'R', 'I', 'F', 'F'};
-
     if (header.chunk_id != expected_chunk_id) {
         std::cout << "Error: Did not receive chunk ID 'RIFF'" << std::endl;
         return;
@@ -91,17 +89,14 @@ void readWAVFile(string filename) {
         return;
     }
 
-    int bytes_per_sample = header.bits_per_sample / 8;
-
-
-
-
-
-
+    // With 16-bit audio, there are 2 bytes for every sample
+    int num_samples = header.data_size / 2;
+    // Create vector to hold audio data
+    std::vector<int16_t> audio_data(num_samples);
 }
 
 int main() {
     std::cout << "test" << std::endl;
-    readWAVFile("audio\file_example_WAV_1MG.wav");
+    readWAVFile("../audio/file_example_WAV_1MG.wav");
 }
 
