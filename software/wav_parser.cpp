@@ -90,6 +90,9 @@ void readWAVFile(string filename) {
     int num_samples = header.data_size / 2;
     // Create vector to hold audio data
     std::vector<int16_t> audio_data(num_samples);
+
+    // Read the audio data
+    is.read(reinterpret_cast<char*>(audio_data.data()), header.data_size);
 }
 
 int main() {
