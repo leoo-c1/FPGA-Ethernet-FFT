@@ -1,4 +1,4 @@
-#pragma once // Prevents this header from being included multiple times
+#pragma once                            // Prevents header from being included multiple times
 #include <vector>
 #include <string>
 #include <cstdint>
