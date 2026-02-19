@@ -1,5 +1,4 @@
 #include <array>
-#include <cstddef>
 #include <vector>
 #include <iostream>
 #include <cstdint>
@@ -27,10 +26,6 @@ struct __attribute__((packed)) wav_header {
     uint32_t byte_rate{};               // = SampleRate * NumChannels * BitsPerSample/8
     uint16_t block_align{};             // = NumChannels * BitsPerSample/8
     uint16_t bits_per_sample{};         // Bit depth, 8-bit = 8, 16-bit = 16, etc
-
-    // data header
-    char data_id[4]{};                  // 'data', 4 characters
-    uint32_t data_size{};               // = NumSamples * NumChannels * BitsPerSample/8
 };
 
 vector<int16_t> readWAVFile(string filename) {
@@ -88,13 +83,42 @@ vector<int16_t> readWAVFile(string filename) {
         return {};
     }
 
+    // Skip any extra bytes in the fmt chunk if it's larger than 16 bytes
+    if (header.fmt_size > 16) {
+        is.seekg(header.fmt_size - 16, ios::cur);
+    }
+
+    char current_chunk_id[4];
+    uint32_t current_chunk_size;
+
+    // Loop through remaining chunks until we find 'data'
+    while (true) {
+        // Read the 4-byte ID and 4-byte size of the next chunk
+        is.read(current_chunk_id, 4);
+        is.read(reinterpret_cast<char*>(&current_chunk_size), 4);
+
+        // Return an error if we hit the end of the file without finding the data chunk
+        if (is.eof()) {
+            cout << "Error: Reached end of file without finding data chunk" << endl;
+            return {};
+        }
+
+        // Check if the chunk ID is 'data'
+        if (strncmp(current_chunk_id, "data", 4) == 0) {
+            break;
+        }
+
+        // If it is not 'data', skip past this chunk's payload
+        is.seekg(current_chunk_size, ios::cur);
+    }
+
     // With 16-bit audio, there are 2 bytes for every sample
-    int num_samples = header.data_size / 2;
+    int num_samples = current_chunk_size / 2;
     // Create vector to hold audio data
     vector<int16_t> audio_data(num_samples);
 
     // Read the audio data
-    is.read(reinterpret_cast<char*>(audio_data.data()), header.data_size);
+    is.read(reinterpret_cast<char*>(audio_data.data()), current_chunk_size);
 
     // Close the wav file
     cout << "Finished reading wav file" << endl;
