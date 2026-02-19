@@ -96,7 +96,8 @@ void readWAVFile(string filename) {
 }
 
 int main() {
-    std::cout << "test" << std::endl;
+    std::cout << "Reading wav file..." << std::endl;
     readWAVFile("../audio/file_example_WAV_1MG.wav");
+    is.close();
 }
 
