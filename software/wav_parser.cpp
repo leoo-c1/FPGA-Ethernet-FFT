@@ -33,13 +33,14 @@ struct __attribute__((packed)) wav_header {
     uint32_t data_size{};               // = NumSamples * NumChannels * BitsPerSample/8
 };
 
-std::vector<int16_t> readWAVFile(string filename) {
+vector<int16_t> readWAVFile(string filename) {
     // Open the wav file
+    cout << "Opening wav file..." << endl;
     is.open(filename, ios::binary);
 
     // If it isn't open, return an error
     if (!is.is_open()) {
-        cout << "Could not open the wav file" << std::endl;
+        cout << "Could not open the wav file" << endl;
         return {};
     }
 
@@ -51,55 +52,58 @@ std::vector<int16_t> readWAVFile(string filename) {
     // Create a wav_header struct
     wav_header header;
      // Read from the file
+    cout << "Reading wav file..." << endl;
     is.read(reinterpret_cast<char*>(&header), sizeof(wav_header));
 
     if (strncmp(header.chunk_id, "RIFF", 4) != 0) {
-        std::cout << "Error: Did not receive chunk ID 'RIFF'" << std::endl;
+        cout << "Error: Did not receive chunk ID 'RIFF'" << endl;
         return {};
     }
     if (strncmp(header.format, "WAVE", 4) != 0) {
-        std::cout << "Error: Did not receive format 'WAVE'" << std::endl;
+        cout << "Error: Did not receive format 'WAVE'" << endl;
         return {};
     }
     if (strncmp(header.fmt_id, "fmt ", 4) != 0) {
-        std::cout << "Error: Did not receive fmt ID 'fmt '" << std::endl;
+        cout << "Error: Did not receive fmt ID 'fmt '" << endl;
         return {};
     }
     if (header.audio_format != 1) {
-        std::cout << "Error: Audio format is not PCM" << std::endl;
+        cout << "Error: Audio format is not PCM" << endl;
         return {};
     }
     if (header.num_channels != 1) {
-        std::cout << "Error: Audio is not mono" << std::endl;
+        cout << "Error: Audio is not mono" << endl;
         return {};
     }
     if (header.byte_rate != (header.sample_rate * header.num_channels * header.bits_per_sample/8)) {
-        std::cout << "Error: Invalid byte rate" << std::endl;
+        cout << "Error: Invalid byte rate" << endl;
         return {};
     }
     if (header.block_align != (header.num_channels * header.bits_per_sample/8)) {
-        std::cout << "Error: Invalid block align" << std::endl;
+        cout << "Error: Invalid block align" << endl;
         return {};
     }
     if (header.bits_per_sample != 16) {
-        std::cout << "Error: Bit depth is not 16-bit" << std::endl;
+        cout << "Error: Bit depth is not 16-bit" << endl;
         return {};
     }
 
     // With 16-bit audio, there are 2 bytes for every sample
     int num_samples = header.data_size / 2;
     // Create vector to hold audio data
-    std::vector<int16_t> audio_data(num_samples);
+    vector<int16_t> audio_data(num_samples);
 
     // Read the audio data
     is.read(reinterpret_cast<char*>(audio_data.data()), header.data_size);
+
+    // Close the wav file
+    cout << "Finished reading wav file" << endl;
+    is.close();
 
     return audio_data;
 }
 
 int main() {
-    std::cout << "Reading wav file..." << std::endl;
     readWAVFile("../audio/example_wav_mono.wav");
-    is.close();
 }
 
