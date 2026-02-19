@@ -99,7 +99,7 @@ std::vector<int16_t> readWAVFile(string filename) {
 
 int main() {
     std::cout << "Reading wav file..." << std::endl;
-    readWAVFile("../audio/file_example_WAV_1MG.wav");
+    readWAVFile("../audio/example_wav_mono.wav");
     is.close();
 }
 
