@@ -12,7 +12,7 @@ package eth_types_pkg;
         logic [3:0] version;
         logic [3:0] header_len;
         logic [5:0] dscp;
-        logic [2:0] ecn;
+        logic [1:0] ecn;
         logic [1:0][7:0] total_len;
         logic [1:0][7:0] identification;
         logic [2:0] flags;
