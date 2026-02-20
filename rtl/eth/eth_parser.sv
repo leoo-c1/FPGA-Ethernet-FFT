@@ -24,29 +24,9 @@ module eth_parser #(
 
     eth_states state;                   // The current ethernet state we are in
 
-    logic [47:0] dest_mac_flat;
-    logic [15:0] ethertype_flat;
-    logic [31:0] dest_ip_flat;
-    logic [15:0] dest_port_flat;
-    logic [15:0] udp_len_flat;
-
-    // Destination MAC
-    assign dest_mac_flat = {frame_header_content.dest_mac[0], frame_header_content.dest_mac[1],
-                            frame_header_content.dest_mac[2], frame_header_content.dest_mac[3],
-                            frame_header_content.dest_mac[4], frame_header_content.dest_mac[5]};
-
     // Ethertype, low byte is the current received byte at the time of checking this
+    logic [15:0] ethertype_flat;
     assign ethertype_flat = {frame_header_content.ethertype[0], received_byte};
-
-    // Destination IP address
-    assign dest_ip_flat = {ip_header_content.dest_ip[0], ip_header_content.dest_ip[1],
-                           ip_header_content.dest_ip[2], ip_header_content.dest_ip[3]};
-
-    // Destination UDP port
-    assign dest_port_flat = {udp_header_content.dest_port[0], udp_header_content.dest_port[1]};
-
-    // UDP length
-    assign udp_len_flat = {udp_header_content.udp_len[0], udp_header_content.udp_len[1]};
 
     logic [16:0] ip_checksum_calc;      // The calculated checksum of the IP header
     logic [31:0] ip_checksum_acc;       // 32 bits to handle overflow carries
@@ -102,7 +82,7 @@ module eth_parser #(
                         byte_counter <= 0;
                         ip_checksum_acc <= 0;
                         // Make sure the destination mac is ours and ethertype is 0x0800 (IPv4)
-                        if ((dest_mac_flat == FPGA_MAC) & (ethertype_flat == 16'h0800))
+                        if ((frame_header_content.dest_mac == FPGA_MAC) & (ethertype_flat == 16'h0800))
                             state <= IP_HEADER;
                         else
                             state <= IDLE;
@@ -178,7 +158,7 @@ module eth_parser #(
                 if (byte_valid) begin
                     if (byte_counter == 0) begin
                         // Check if checksum is the valid 0x0000 and dest_ip matches the FPGA's IP
-                        if (~(ip_checksum_calc == 16'h0000) | ~(dest_ip_flat == FPGA_IP))
+                        if (~(ip_checksum_calc == 16'h0000) | ~(ip_header_content.dest_ip == FPGA_IP))
                             state <= IDLE;
                     end
 
@@ -204,7 +184,7 @@ module eth_parser #(
                         current_word <= 16'b0;
 
                         // Check if dest_port matches the FPGA's port
-                        if (dest_port_flat == FPGA_PORT)
+                        if (udp_header_content.dest_port == FPGA_PORT)
                             state <= PAYLOAD;
                         else
                             state <= IDLE;
@@ -216,11 +196,11 @@ module eth_parser #(
                     payload_valid <= 1'b1;
                     payload <= received_byte;
 
-                    if (byte_counter < udp_len_flat - 16'd9) begin
+                    if (byte_counter < udp_header_content.udp_len - 16'd9) begin
                         byte_counter <= byte_counter + 1'b1;
                         payload_last <= 1'b0;
                     end
-                    else if (byte_counter == udp_len_flat - 16'd9) begin
+                    else if (byte_counter == udp_header_content.udp_len - 16'd9) begin
                         byte_counter <= 0;
                         payload_last <= 1'b1;
                         state <= FCS;
