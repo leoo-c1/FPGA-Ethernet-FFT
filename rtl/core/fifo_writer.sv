@@ -14,8 +14,7 @@ module fifo_writer (
     input logic wr_full,                // Indicates the fifo is currently full
 
     output logic wrreq,                 // Requests a write operation when high
-    output logic [15:0] fifo_data,      // The data we write to the fifo
-
+    output logic [15:0] fifo_data       // The data we write to the fifo
     );
 
     logic [7:0] data_storage;           // Temporarily hold payload data
@@ -31,18 +30,22 @@ module fifo_writer (
     
         // If we hit the end of a payload chunk
         end else if (payload_last) begin
-            case (chunk_count)
-                0: begin
-                    data_storage <= payload;
-                    chunk_count <= 1'b1;
-                end
-                1: begin
-                    fifo_data <= {payload, data_storage};
-                    chunk_count <= 1'b0;
+            // If this is the first chunk we have come across
+            if (chunk_count == 1'b0) begin
+                data_storage <= payload;    // Store the data
+                chunk_count <= 1'b1;
+            // If this is the second chunk we have come across
+            end else begin
+                fifo_data <= {payload, data_storage};   // Combine the stored data with the data we received
+                chunk_count <= 1'b0;
+                // Check if the fifo isn't full
+                if (!wr_full)
                     wrreq <= 1'b1;
-                end
-            endcase
-            
+                // If it is full, don't write to it
+                else
+                    wrreq <= 1'b0;
+            end
+
         // If we haven't hit the end of a payload chunk
         end else begin
             wrreq <= 1'b0;
