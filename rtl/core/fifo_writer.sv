@@ -28,9 +28,9 @@ module fifo_writer (
             wrreq <= 1'b0;
             fifo_data <= 16'b0;
     
-        // If we hit the end of a payload chunk
-        end else if (payload_last) begin
-            // If this is the first chunk we have come across
+        // If we are receiving payload data
+        end else if (payload_valid) begin
+            // Check if this is the first 8 bits of the 16-bit group
             if (chunk_count == 1'b0) begin
                 data_storage <= payload;    // Store the data
                 chunk_count <= 1'b1;
@@ -46,14 +46,15 @@ module fifo_writer (
                     wrreq <= 1'b0;
             end
 
-        // If we haven't hit the end of a payload chunk
+        // If we aren't receiving payload data
         end else begin
             wrreq <= 1'b0;
         end
 
+        // On the last 8-bit payload chunk, reset the chunk counter
+        if (payload_last)
+            chunk_count <= 1'b0;
+
     end
-
-
-
 
 endmodule
