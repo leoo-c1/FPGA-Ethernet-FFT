@@ -1,6 +1,6 @@
 import eth_types_pkg::*;
 
-module ethernet_top (
+module ethernet_handler (
     input logic clk,                    // 50MHz LAN8720 clock
     input logic resetn,                 // Active low reset button
 
