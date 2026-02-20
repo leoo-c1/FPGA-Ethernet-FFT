@@ -1,0 +1,4 @@
+# Ignore generated Quartus IP files in language statistics
+fft/** linguist-generated=true
+fifo/** linguist-generated=true
+*.vhd linguist-generated=true
