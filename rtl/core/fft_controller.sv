@@ -9,7 +9,6 @@ module fft_controller (
 
     input logic [15:0] fifo_q,          // The data we extract from the FIFO
     input logic [11:0] rdusedw,         // How many words (1 word = 16 bits) are currently in the FIFO
-    input logic rdempty,                // Flag to indicate the FIFO is empty
 
     input logic sink_ready,             // Flag from the FFT telling us it is ready to read data
 
@@ -26,7 +25,7 @@ module fft_controller (
         READING                         // In this state, we are in the process of reading 1024 bytes
     } read_state;
 
-    read_state state;
+    read_state
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
     logic read_active;                  // Flag for when we are actively reading data
