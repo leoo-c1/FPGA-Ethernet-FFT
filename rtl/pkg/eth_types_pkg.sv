@@ -1,14 +1,14 @@
 package eth_types_pkg;
 
     // Ethernet frame header components
-    typedef struct {
+    typedef struct packed {
         logic [5:0][7:0] dest_mac;
         logic [5:0][7:0] src_mac;
         logic [1:0][7:0] ethertype;
     } frame_header;
 
     // IP packet header components
-    typedef struct {
+    typedef struct packed {
         logic [3:0] version;
         logic [3:0] header_len;
         logic [5:0] dscp;
@@ -25,7 +25,7 @@ package eth_types_pkg;
     } ip_header;
 
     // UDP datagram header components
-    typedef struct {
+    typedef struct packed {
         logic [1:0][7:0] src_port;
         logic [1:0][7:0] dest_port;
         logic [1:0][7:0] udp_len;
