@@ -32,10 +32,17 @@ module audio_visualiser_top #(
     logic [15:0] fifo_data;             // The data we write to the fifo
     logic wrreq;                        // Requests a write operation to the FIFO when high
 
-    // u_fft_controller <--> u_audio_fifo
+    // u_audio_fifo <--> u_fft_controller
     logic rdreq;                        // Requests a read operation from the FIFO when high
     logic [15:0] fifo_q;                // The data we extract from the FIFO
     logic [11:0] rdusedw;               // How many words (1 word = 16 bits) are currently in the FIFO
+
+    // u_fft_controller <--> u_audio_fft
+    logic sink_ready;                   // Flag from the FFT telling us it is ready to read data
+    logic [15:0] sink_real;             // The real part of the audio we want to send to the FFT module
+    logic sink_valid;                   // Requests the FFT to read our audio data
+    logic sink_sop;                     // Pulses at the start of an audio packet
+    logic sink_eop;                     // Pulses at the end of an audio packet
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -74,5 +81,18 @@ module audio_visualiser_top #(
         .rdusedw(rdusedw),
         .wrfull(wr_full)
 	);
+
+    fft_controller u_fft_controller (
+        .board_clk(board_clk),
+        .resetn(resetn),
+        .fifo_q(fifo_q),
+        .rdusedw(rdusedw),
+        .sink_ready(sink_ready),
+        .rdreq(rdreq),
+        .sink_real(sink_real),
+        .sink_valid(sink_valid),
+        .sink_sop(sink_sop),
+        .sink_eop(sink_eop)
+    );
 
 endmodule
