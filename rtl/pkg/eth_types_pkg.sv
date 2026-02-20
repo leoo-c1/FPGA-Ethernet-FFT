@@ -32,7 +32,7 @@ package eth_types_pkg;
         logic [0:1][7:0] udp_csum;
     } udp_header;
 
-    typedef enum [2:0] {
+    typedef enum logic [2:0] {
         IDLE,           // Haven't received the SFD yet
         ETH_HEADER,     // Reading MACs and EtherType
         IP_HEADER,      // Reading IP header
