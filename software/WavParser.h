@@ -26,6 +26,7 @@ private:
     std::string filename;
     std::vector<int16_t> audio_data;
     int file_length;
+    uint32_t sample_rate;
 
 public:
     // Constructor
@@ -37,6 +38,9 @@ public:
     // Public method to trigger the parsing
     bool parse();
 
-    // Getter to retrieve the data safely
+    // Getter to retrieve the data
     const std::vector<int16_t>& getAudioData() const;
+
+    // Getter to retrieve the wav file's sample rate
+    uint32_t getSampleRate() const;
 };
