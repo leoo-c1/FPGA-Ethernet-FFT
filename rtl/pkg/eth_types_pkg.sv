@@ -2,9 +2,9 @@ package eth_types_pkg;
 
     // Ethernet frame header components
     typedef struct packed {
-        logic [5:0][7:0] dest_mac;
-        logic [5:0][7:0] src_mac;
-        logic [1:0][7:0] ethertype;
+        logic [0:5][7:0] dest_mac;
+        logic [0:5][7:0] src_mac;
+        logic [0:1][7:0] ethertype;
     } frame_header;
 
     // IP packet header components
@@ -13,23 +13,23 @@ package eth_types_pkg;
         logic [3:0] header_len;
         logic [5:0] dscp;
         logic [1:0] ecn;
-        logic [1:0][7:0] total_len;
-        logic [1:0][7:0] identification;
-        logic [2:0] flags;
-        logic [12:0] frag_offset;
+        logic [0:1][7:0] total_len;
+        logic [0:1][7:0] identification;
+        logic [0:2] flags;
+        logic [0:12] frag_offset;
         logic [7:0] ttl;
         logic [7:0] protocol;
-        logic [1:0][7:0] header_csum;
-        logic [3:0][7:0] src_ip;
-        logic [3:0][7:0] dest_ip;
+        logic [0:1][7:0] header_csum;
+        logic [0:3][7:0] src_ip;
+        logic [0:3][7:0] dest_ip;
     } ip_header;
 
     // UDP datagram header components
     typedef struct packed {
-        logic [1:0][7:0] src_port;
-        logic [1:0][7:0] dest_port;
-        logic [1:0][7:0] udp_len;
-        logic [1:0][7:0] udp_csum;
+        logic [0:1][7:0] src_port;
+        logic [0:1][7:0] dest_port;
+        logic [0:1][7:0] udp_len;
+        logic [0:1][7:0] udp_csum;
     } udp_header;
 
     typedef enum [2:0] {
