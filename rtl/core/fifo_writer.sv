@@ -28,24 +28,24 @@ module fifo_writer (
             chunk_count <= 1'b0;
             wrreq <= 1'b0;
             fifo_data <= 16'b0;
+    
+        // If we hit the end of a payload chunk
+        end else if (payload_last) begin
+            case (chunk_count)
+                0: begin
+                    data_storage <= payload;
+                    chunk_count <= 1'b1;
+                end
+                1: begin
+                    fifo_data <= {payload, data_storage};
+                    chunk_count <= 1'b0;
+                    wrreq <= 1'b1;
+                end
+            endcase
             
-        end else if (payload_valid) begin
-            if (payload_last) begin
-                case (chunk_count)
-                    0: begin
-                        data_storage <= payload;
-                        chunk_count <= 1'b1;
-                    end
-                    1: begin
-                        fifo_data <= {payload, data_storage};
-                        chunk_count <= 1'b0;
-                    end
-                endcase
-            end
-            
-
+        // If we haven't hit the end of a payload chunk
         end else begin
-
+            wrreq <= 1'b0;
         end
 
     end
