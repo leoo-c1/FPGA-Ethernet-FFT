@@ -21,54 +21,69 @@ module fft_controller {
     output logic sink_eop               // Pulses at the end of an audio packet
     };
 
-    logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
+    typedef enum logic {
+        IDLE,                           // Not reading anything in this state
+        READING                         // In this state, we are in the process of reading 1024 bytes
+    } read_state;
 
+    logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
+    logic read_active;                  // Flag for when we are actively reading data
+
+    // State machine and FIFO read request
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
+            state <= IDLE;
             rdreq <= 1'b0;
-            sink_real <= 16'b0;
-            sink_valid <= 1'b0;
-            sink_sop <= 1'b0;
-            sink_eop <= 1'b0;
             word_counter <= 1'b0;
+            read_active  <= 1'b0;
 
-        // If the fifo isn't empty
-        end else (!rdempty) begin
-            // Default to having sink pulses as low
-            sink_sop <= 1'b0;
-            sink_eop <= 1'b0;
+        end else begin
+            // Default to not requesting data
+            rdreq <= 1'b0;
+            read_active  <= 1'b0;
 
-            // Check if we have enough words (1024) to send to the FFT
-            if (rdusedw >= 12'd1024) begin
-                rdreq <= 1'b1;          // Request a read operation
+            if (state == IDLE) begin
+                word_counter <= 10'd0;
 
-                // If the FFT is ready to read our data
+                // If the FIFO contains 1024 words, start reading
+                if (rdusedw >= 12'd1024)
+                    state <= READING;
+
+
+            end else if (state == READING) begin
+                // Only read if the FFT is ready to accept data
                 if (sink_ready) begin
-                    sink_valid <= 1'b1;     // Indicate sink is valid
-                    sink_real <= fifo_q;    // Send fifo output to FFT
+                    rdreq <= 1'b1;
+                    read_active <= 1'b1;
+
+                    if (word_counter < 10'd1023)
+                        word_counter <= word_counter + 10'd1;
+                    else
+                        state <= IDLE;
                 end
-
-                // Indicate start of packet if this is the first word we are sending
-                if (word_counter == 10'b0;)
-                    sink_sop <= 1'b1;
-
-                // Indicate end of packet if this is the last word we are sending  
-                else if (word_counter == 10'd1023)
-                    sink_eop <= 1'b1;
-
-                if (word_counter < 1023)
-                    word_counter <= word_counter + 10'd1;
-                else
-                    word_counter <= 10'b0;
             end
 
-
-        // If the fifo is empty
-        end else begin
-            // Don't read from it
-            rdreq <= 1'b0;
         end
     end
 
+    // FFT sending
+    always_ff @ (posedge board_clk or negedge resetn) begin
+        if (!resetn) begin
+            sink_valid <= 1'b0;
+            sink_sop <= 1'b0;
+            sink_eop <= 1'b0;
+            sink_real <= 16'd0;
+
+        end else begin
+            sink_real <= fifo_q;
+            sink_valid <= read_active;
+
+            if (read_active && (word_counter == 10'd0))
+                sink_sop <= 1'b1;
+            
+            if (read_active && (word_counter == 10'd1023))
+                sink_eop <= 1'b1;
+        end
+    end
 
 endmodule
