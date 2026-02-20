@@ -78,11 +78,8 @@ module fft_controller {
             sink_real <= fifo_q;
             sink_valid <= read_active;
 
-            if (read_active && (word_counter == 10'd0))
-                sink_sop <= 1'b1;
-            
-            if (read_active && (word_counter == 10'd1023))
-                sink_eop <= 1'b1;
+            sink_sop <= read_active && (word_counter == 10'd0);
+            sink_eop <= read_active && (word_counter == 10'd1023);
         end
     end
 
