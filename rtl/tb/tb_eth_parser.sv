@@ -5,6 +5,8 @@ module tb_eth_parser;
     logic clk;                  // 50MHz LAN8720 clock
     logic resetn;               // Reset button (active low)
 
+    logic data_valid;
+
     logic [7:0] received_byte;  // The byte of data we have received from the LAN8720
     logic byte_valid;           // Pulses for one clock cycle on valid byte
 
@@ -19,6 +21,7 @@ module tb_eth_parser;
     ) eth_parser_test (
         .clk(clk),
         .resetn(resetn),
+        .data_valid(data_valid),
         .received_byte(received_byte),
         .byte_valid(byte_valid),
         .payload(payload),
@@ -47,6 +50,7 @@ module tb_eth_parser;
         input [31:0] task_payload;
 
         begin
+            data_valid = 1'b1;      // Make data_valid go high
             send_byte(8'h55);       // Start preamble
             send_byte(8'h55);
             send_byte(8'h55);
@@ -131,12 +135,11 @@ module tb_eth_parser;
             send_byte(8'h8E);
             send_byte(8'h8E);
             send_byte(8'h8E);
+
+            @ (posedge clk);
+            data_valid = 1'b0;      // Make data_valid low after the frame
         end
     endtask
-
-    initial begin
-        clk = 0;
-    end
 
     always begin
         #10 clk = ~clk;         // Generate 50MHz clock signal
@@ -145,6 +148,7 @@ module tb_eth_parser;
     initial begin
         clk = 0;            // Initially, clock is low
         resetn = 0;         // Reset is active
+        data_valid = 0;
 
         #200 resetn = 1;    // After 200ns, turn off the reset signal
         #200;               // Wait another 200ns doing nothing
