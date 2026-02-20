@@ -3,7 +3,7 @@ Handles reading from the FIFO buffer and connecting the read data to the FFT.
 The onboard 50MHz clock is used for reading the FIFO buffer
 */
 
-module fft_controller {
+module fft_controller (
     input logic board_clk,              // 50MHz FPGA onboard clock
     input logic resetn,                 // Active low reset button
 
@@ -19,12 +19,14 @@ module fft_controller {
     output logic sink_valid,            // Requests the FFT to read our audio data
     output logic sink_sop,              // Pulses at the start of an audio packet
     output logic sink_eop               // Pulses at the end of an audio packet
-    };
+    );
 
     typedef enum logic {
         IDLE,                           // Not reading anything in this state
         READING                         // In this state, we are in the process of reading 1024 bytes
     } read_state;
+
+    read_state state;
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
     logic read_active;                  // Flag for when we are actively reading data
