@@ -17,8 +17,9 @@ int main() {
         return 1;
     }
 
-    // Retrieve the parsed audio data
+    // Retrieve the parsed audio data and sample rate
     const std::vector<int16_t>& audio_track = parser.getAudioData();
+    uint32_t file_sample_rate = parser.getSampleRate();
     std::cout << "Loaded " << audio_track.size() << " total samples into memory" << std::endl;
 
     // Instantiate the Ethernet Sender
@@ -26,12 +27,12 @@ int main() {
     EthSender sender(fpga_ip, fpga_port);
 
     // Send the data to the FPGA
-    if (sender.sendData(audio_track)) {
+    if (sender.sendData(audio_track, file_sample_rate)) {
         std::cout << "Audio data has been sent to the FPGA" << std::endl;
     } else {
         std::cout << "Error: Failed to send audio data to the FPGA" << std::endl;
         return 1;
     }
-    
+
     return 0;
 }
