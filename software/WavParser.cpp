@@ -36,6 +36,9 @@ bool WavParser::parse() {
     cout << "Reading wav file..." << endl;
     is.read(reinterpret_cast<char*>(&header), sizeof(wav_header));
 
+    // Store sample rate
+    sample_rate = header.sample_rate;
+
     if (strncmp(header.chunk_id, "RIFF", 4) != 0) {
         cout << "Error: Did not receive chunk ID 'RIFF'" << endl;
         return false;
@@ -118,4 +121,9 @@ bool WavParser::parse() {
 // Getter function for main.cpp to access the parsed data
 const vector<int16_t>& WavParser::getAudioData() const {
     return audio_data;
+}
+
+// Getter function for main.cpp to access the sample rate
+uint32_t WavParser::getSampleRate() const {
+    return sample_rate;
 }
