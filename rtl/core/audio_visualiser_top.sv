@@ -22,21 +22,20 @@ module audio_visualiser_top #(
     output blue                         // Pixel blue value (single bit, 0v or 0.7v)
     );
 
-    // u_ethernet_handler -> u_fifo_writer
+    // u_ethernet_handler <--> u_fifo_writer
     logic [7:0] payload;                // The ethernet payload data
     logic payload_valid;                // Whether we are currently receiving payload data
     logic payload_last;                 // Pulses on the last byte of our payload data
 
-    // u_fifo_writer -> u_audio_fifo
+    // u_fifo_writer <--> u_audio_fifo
     logic wr_full;                      // Indicates the fifo is currently full
     logic [15:0] fifo_data;             // The data we write to the fifo
     logic wrreq;                        // Requests a write operation to the FIFO when high
 
-    // u_fft_controller -> u_audio_fifo
+    // u_fft_controller <--> u_audio_fifo
     logic rdreq;                        // Requests a read operation from the FIFO when high
-
-    
-
+    logic [15:0] fifo_q;                // The data we extract from the FIFO
+    logic [11:0] rdusedw;               // How many words (1 word = 16 bits) are currently in the FIFO
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -66,17 +65,14 @@ module audio_visualiser_top #(
     );
 
     audio_fifo u_audio_fifo (
-	.data(fifo_data),
-	.rdclk(board_clk),
-	.rdreq( rdreq_sig ),
-	.wrclk( wrclk_sig ),
-	.wrreq( wrreq_sig ),
-	.q( q_sig ),
-	.rdempty( rdempty_sig ),
-	.rdusedw( rdusedw_sig ),
-	.wrfull( wrfull_sig )
+        .data(fifo_data),
+        .rdclk(board_clk),
+        .rdreq(rdreq),
+        .wrclk(phy_clk),
+        .wrreq(wrreq),
+        .q(fifo_q),
+        .rdusedw(rdusedw),
+        .wrfull(wr_full)
 	);
-
-
 
 endmodule
