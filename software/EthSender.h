@@ -19,5 +19,5 @@ public:
     ~EthSender();
 
     // Sends the vector of audio data over Ethernet
-    bool sendData(const std::vector<int16_t>& data);
+    bool sendData(const std::vector<int16_t>& data, uint32_t sample_rate);
 };

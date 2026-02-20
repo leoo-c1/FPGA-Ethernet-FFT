@@ -1,6 +1,8 @@
 #include "EthSender.h"
 #include <iostream>
 #include <algorithm>
+#include <thread>
+#include <chrono>
 
 EthSender::EthSender(const std::string& ip_address, int port) {
     is_initialised = false;
@@ -45,7 +47,7 @@ EthSender::~EthSender() {
     WSACleanup();
 }
 
-bool EthSender::sendData(const std::vector<int16_t>& data) {
+bool EthSender::sendData(const std::vector<int16_t>& data, uint32_t sample_rate) {
     // If socket isn't ready, return false
     if (!is_initialised) {
         std::cout << "Failed, socket not initialised" << std::endl;
@@ -78,6 +80,10 @@ bool EthSender::sendData(const std::vector<int16_t>& data) {
             std::cout << "Sent " << send_result << " bytes" << std::endl;
             // Update sent samples count
             samples_sent += samples_to_send;
+
+            // Add delay for the length that the byte chunk plays for
+            unsigned long long delay_us = (samples_to_send * 1000000LL) / sample_rate;
+            std::this_thread::sleep_for(std::chrono::microseconds(delay_us));
         }
     }
 
