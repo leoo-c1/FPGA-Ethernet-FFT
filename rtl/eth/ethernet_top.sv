@@ -38,6 +38,7 @@ module ethernet_top (
     ) ethernet_parser (
         .clk(clk),
         .resetn(resetn),
+        .data_valid(data_valid),
         .received_byte(received_byte),
         .byte_valid(byte_valid),
         .payload(payload),
