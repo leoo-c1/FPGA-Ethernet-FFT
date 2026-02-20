@@ -30,6 +30,8 @@ module fifo_writer (
     
         // If we are receiving payload data
         end else if (payload_valid) begin
+            wrreq <= 1'b0;
+            
             // Check if this is the first 8 bits of the 16-bit group
             if (chunk_count == 1'b0) begin
                 data_storage <= payload;    // Store the data
