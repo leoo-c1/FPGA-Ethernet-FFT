@@ -1,6 +1,10 @@
 import eth_types_pkg::*;
 
-module ethernet_handler (
+module ethernet_handler #(
+    parameter FPGA_MAC = 48'h00_1A_2B_3C_4D_5E,
+    parameter FPGA_IP = 32'hC0_00_02_92,
+    parameter FPGA_PORT = 16'd5005
+    )(
     input logic clk,                    // 50MHz LAN8720 clock
     input logic resetn,                 // Active low reset button
 
@@ -32,9 +36,9 @@ module ethernet_handler (
     );
 
     eth_parser #(
-        .FPGA_MAC(48'h00_1A_2B_3C_4D_5E),
-        .FPGA_IP(32'hC0_00_02_92),
-        .FPGA_PORT(16'd5005)
+        .FPGA_MAC(FPGA_MAC),
+        .FPGA_IP(FPGA_IP),
+        .FPGA_PORT(FPGA_PORT)
     ) ethernet_parser (
         .clk(clk),
         .resetn(resetn),
