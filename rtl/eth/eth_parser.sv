@@ -8,6 +8,8 @@ module eth_parser #(
     input logic clk,                    // 50MHz LAN8720 clock
     input logic resetn,                 // Reset button (active low)
 
+    input logic data_valid,             // Flag to indicate we are receiving valid data
+
     input logic [7:0] received_byte,    // The byte of data we have received from the LAN8720
     input logic byte_valid,             // Pulses for one clock cycle on valid byte
 
@@ -70,7 +72,8 @@ module eth_parser #(
             payload_last <= 1'b0;
             byte_counter <= 0;
             ip_checksum_acc <= 0;
-        end else begin
+        end else if (data_valid) begin
+            // If data_valid is high we are receiving an ethernet frame, progress through the states
             if (state == IDLE) begin
                 payload_valid <= 1'b0;
                 payload_last <= 1'b0;
@@ -239,6 +242,12 @@ module eth_parser #(
             end else begin
                 state <= IDLE;
             end
+        end else begin
+            // If data valid goes low, go back to the idle state
+            state <= IDLE;
+            payload_valid <= 1'b0;
+            payload_last <= 1'b0;
+            byte_counter <= 0;
         end
     end
 
