@@ -44,7 +44,7 @@ module audio_visualiser_top #(
     logic sink_eop;                     // Pulses at the end of an audio packet
     logic [15:0] sink_real;             // The real part of the audio we want to send to the FFT module
 
-    // u_audio_fft <--> u_magnitude_calc
+    // u_audio_fft <--> u_amplitude_calc
     logic source_valid;                 // Flag to indicate the FFT has sent valid output
     logic source_sop;                   // Start of packet (frequency bin 0)
     logic source_eop;                   // End of packet (frequency bin 1023)
@@ -53,10 +53,10 @@ module audio_visualiser_top #(
 
     // Placeholder, will use these in video logic rendering EQ bars for the audio visualiser
     logic [5:0] source_exp;
-    logic [15:0] magnitude;             // The calculated frequency amplitude
-    logic mag_valid;                    // Pulses high when 'magnitude' is ready
-    logic mag_sop;                      // Aligned with frequency bin 0
-    logic mag_eop;                      // Aligned with frequency bin 1023
+    logic [15:0] amplitude;             // The calculated frequency amplitude
+    logic amp_valid;                    // Pulses high when 'amplitude' is ready
+    logic amp_sop;                      // Aligned with frequency bin 0
+    logic amp_eop;                      // Aligned with frequency bin 1023
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -109,7 +109,7 @@ module audio_visualiser_top #(
         .sink_eop(sink_eop)
     );
 
-    audio_fft u0 (
+    audio_fft u_audio_fft (
 		.clk(board_clk),
 		.reset_n(resetn),
 		.sink_valid(sink_valid),
@@ -129,7 +129,7 @@ module audio_visualiser_top #(
 		.source_exp(source_exp)
 	);
 
-    magnitude_calc u_magnitude_calc (
+    amplitude_calc u_amplitude_calc (
         .board_clk(board_clk),
         .resetn(resetn),
         .source_real(source_real),
@@ -137,10 +137,10 @@ module audio_visualiser_top #(
         .source_valid(source_valid),
         .source_sop(source_sop),
         .source_eop(source_eop),
-        .magnitude(magnitude),
-        .mag_valid(mag_valid),
-        .mag_sop(mag_sop),
-        .mag_eop(mag_eop)
+        .amplitude(amplitude),
+        .amp_valid(amp_valid),
+        .amp_sop(amp_sop),
+        .amp_eop(amp_eop)
     );
 
 
