@@ -26,6 +26,7 @@ module ram_writer (
             // Check if magnitude data is available
             if (mag_valid) begin
                 wren <= 1'b1;
+                data <= magnitude;
                 // If this is the last magnitude we receive, restart our counter
                 if (mag_eop)
                     mag_counter <= 1'b0;
