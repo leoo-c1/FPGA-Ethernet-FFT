@@ -115,9 +115,9 @@ module eth_parser #(
                         end
                         7: ip_header_content.frag_offset[7:0] <= received_byte;
 
-                        8: ip_header_content.ttl[0] <= received_byte;
+                        8: ip_header_content.ttl <= received_byte;
 
-                        9: ip_header_content.protocol[0] <= received_byte;
+                        9: ip_header_content.protocol <= received_byte;
 
                         10: ip_header_content.header_csum[0] <= received_byte;
                         11: ip_header_content.header_csum[1] <= received_byte;
