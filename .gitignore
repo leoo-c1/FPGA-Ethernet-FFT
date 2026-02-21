@@ -34,3 +34,4 @@ greybox_tmp/
 *.qsys_edit
 *.exe
 eth_sender.exe
+eth_fft_top_description.txt
