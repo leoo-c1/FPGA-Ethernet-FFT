@@ -9,9 +9,9 @@ module amplitude_calc (
     input logic source_eop,                 // End of packet (frequency bin 1023)
 
     output logic [15:0] amplitude,          // The calculated frequency amplitude
-    output logic mag_valid,                 // Pulses high when 'amplitude' is ready
-    output logic mag_sop,                   // Aligned with frequency bin 0
-    output logic mag_eop                    // Aligned with frequency bin 1023
+    output logic amp_valid,                 // Pulses high when 'amplitude' is ready
+    output logic amp_sop,                   // Aligned with frequency bin 0
+    output logic amp_eop                    // Aligned with frequency bin 1023
     );
 
     logic [15:0] abs_real;                  // Absolute value of the real part of the frequency amplitude
@@ -35,9 +35,9 @@ module amplitude_calc (
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             amplitude <= 16'b0;
-            mag_valid <= 1'b0;
-            mag_sop <= 1'b0;
-            mag_eop <= 1'b0;
+            amp_valid <= 1'b0;
+            amp_sop <= 1'b0;
+            amp_eop <= 1'b0;
             valid_delay_1 <= 1'b0;
             valid_delay_2 <= 1'b0;
             sop_delay_1 <= 1'b0;
@@ -45,20 +45,20 @@ module amplitude_calc (
             eop_delay_1 <= 1'b0;
             eop_delay_2 <= 1'b0;
         end else begin
-            // Shift register (3 clock cycles) for mag_valid signal
+            // Shift register (3 clock cycles) for amp_valid signal
             valid_delay_1 <= source_valid;
             valid_delay_2 <= valid_delay_1;
-            mag_valid <= valid_delay_2;
+            amp_valid <= valid_delay_2;
 
-            // Shift register (3 clock cycles) for mag_sop signal
+            // Shift register (3 clock cycles) for amp_sop signal
             sop_delay_1 <= source_sop;
             sop_delay_2 <= sop_delay_1;
-            mag_sop <= sop_delay_2;
+            amp_sop <= sop_delay_2;
 
-            // Shift register (3 clock cycles) for mag_eop signal
+            // Shift register (3 clock cycles) for amp_eop signal
             eop_delay_1 <= source_eop;
             eop_delay_2 <= eop_delay_1;
-            mag_eop <= eop_delay_2;
+            amp_eop <= eop_delay_2;
 
             // Check if real part of source is negative
             if (source_real[15])
