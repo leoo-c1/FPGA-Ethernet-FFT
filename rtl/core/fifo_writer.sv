@@ -27,36 +27,36 @@ module fifo_writer (
             chunk_count <= 1'b0;
             wrreq <= 1'b0;
             fifo_data <= 16'b0;
-    
-        // If we are receiving payload data
-        end else if (payload_valid) begin
-            wrreq <= 1'b0;
-            
-            // Check if this is the first 8 bits of the 16-bit group
-            if (chunk_count == 1'b0) begin
-                data_storage <= payload;    // Store the data
-                chunk_count <= 1'b1;
-            // If this is the second chunk we have come across
-            end else begin
-                fifo_data <= {payload, data_storage};   // Combine the stored data with the data we received
-                chunk_count <= 1'b0;
-                // Check if the fifo isn't full
-                if (!wr_full)
-                    wrreq <= 1'b1;
-                // If it is full, don't write to it
-                else
-                    wrreq <= 1'b0;
-            end
 
-        // If we aren't receiving payload data
         end else begin
-            wrreq <= 1'b0;
+            // If we are receiving payload data
+            if (payload_valid) begin
+                wrreq <= 1'b0;
+
+                // Check if this is the first 8 bits of the 16-bit group
+                if (chunk_count == 1'b0) begin
+                    data_storage <= payload;    // Store the data
+                    chunk_count <= 1'b1;
+                // If this is the second chunk we have come across
+                end else begin
+                    fifo_data <= {payload, data_storage};   // Combine the stored data with the data we received
+                    chunk_count <= 1'b0;
+                    // Check if the fifo isn't full
+                    if (!wr_full)
+                        wrreq <= 1'b1;
+                    // If it is full, don't write to it
+                    else
+                        wrreq <= 1'b0;
+                end
+
+            // If we aren't receiving payload data
+            end else
+                wrreq <= 1'b0;
+
+            // On the last 8-bit payload chunk, reset the chunk counter
+            if (payload_last)
+                chunk_count <= 1'b0;
         end
-
-        // On the last 8-bit payload chunk, reset the chunk counter
-        if (payload_last)
-            chunk_count <= 1'b0;
-
     end
 
 endmodule
