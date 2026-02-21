@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2026.02.20.14:22:32"
+ date="2026.02.22.00:35:22"
  outputDirectory="C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fft/audio_fft/">
  <perimeter>
   <parameter
@@ -89,13 +89,13 @@
  </perimeter>
  <entity
    path=""
-   parameterizationKey="audio_fft:1.0:AUTO_CLK_CLOCK_DOMAIN=-1,AUTO_CLK_CLOCK_RATE=-1,AUTO_CLK_RESET_DOMAIN=-1,AUTO_DEVICE=EP4CE6E22C8,AUTO_DEVICE_FAMILY=Cyclone IV E,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1771557751,AUTO_UNIQUE_ID=(altera_fft_ii:25.1:CALC_LATENCY=3162,THROUGHPUT_LATENCY=1113,data_flow=Burst,data_rep=Block Floating Point,design_env=NATIVE,direction=Bi-directional,dsp_resource_opt=false,engine_arch=Quad Output,hard_fp=false,hyper_opt=false,in_order=Natural,in_width=16,in_width_derived=16,length=1024,num_engines=1,num_engines_derived=1,out_order=Natural,out_width=29,out_width_derived=16,selected_device_family=Cyclone IV E,twid_width=16,twid_width_derived=16)"
+   parameterizationKey="audio_fft:1.0:AUTO_CLK_CLOCK_DOMAIN=-1,AUTO_CLK_CLOCK_RATE=-1,AUTO_CLK_RESET_DOMAIN=-1,AUTO_DEVICE=EP4CE6E22C8,AUTO_DEVICE_FAMILY=Cyclone IV E,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1771680921,AUTO_UNIQUE_ID=(altera_fft_ii:25.1:CALC_LATENCY=3162,THROUGHPUT_LATENCY=1113,data_flow=Burst,data_rep=Block Floating Point,design_env=NATIVE,direction=Bi-directional,dsp_resource_opt=false,engine_arch=Quad Output,hard_fp=false,hyper_opt=false,in_order=Natural,in_width=16,in_width_derived=16,length=1024,num_engines=1,num_engines_derived=1,out_order=Natural,out_width=29,out_width_derived=16,selected_device_family=Cyclone IV E,twid_width=16,twid_width_derived=16)"
    instancePathKey="audio_fft"
    kind="audio_fft"
    version="1.0"
    name="audio_fft">
   <parameter name="AUTO_CLK_CLOCK_RATE" value="-1" />
-  <parameter name="AUTO_GENERATION_ID" value="1771557751" />
+  <parameter name="AUTO_GENERATION_ID" value="1771680921" />
   <parameter name="AUTO_DEVICE" value="EP4CE6E22C8" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone IV E" />
   <parameter name="AUTO_CLK_RESET_DOMAIN" value="-1" />

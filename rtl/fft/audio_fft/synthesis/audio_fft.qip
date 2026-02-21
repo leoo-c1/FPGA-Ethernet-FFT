@@ -2,7 +2,7 @@ set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_NAM
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_VERSION "25.1"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_ENV "Qsys"
 set_global_assignment -library "audio_fft" -name SOPCINFO_FILE [file join $::quartus(qip_path) "../../audio_fft.sopcinfo"]
-set_global_assignment -entity "audio_fft" -library "audio_fft" -name SLD_INFO "QSYS_NAME audio_fft HAS_SOPCINFO 1 GENERATION_ID 1771557751"
+set_global_assignment -entity "audio_fft" -library "audio_fft" -name SLD_INFO "QSYS_NAME audio_fft HAS_SOPCINFO 1 GENERATION_ID 1771680921"
 set_global_assignment -library "audio_fft" -name MISC_FILE [file join $::quartus(qip_path) "../audio_fft.cmp"]
 set_global_assignment -library "audio_fft" -name SLD_FILE [file join $::quartus(qip_path) "audio_fft.debuginfo"]
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TARGETED_DEVICE_FAMILY "Cyclone IV E"
@@ -15,7 +15,7 @@ set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONEN
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_REPORT_HIERARCHY "On"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_VERSION "MS4w"
-set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTc3MTU1Nzc1MQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTc3MTY4MDkyMQ==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBJViBF::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::RVA0Q0U2RTIyQzg=::QXV0byBERVZJQ0U="
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfU1BFRURHUkFERQ==::OA==::QXV0byBERVZJQ0VfU1BFRURHUkFERQ=="
