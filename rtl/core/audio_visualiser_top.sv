@@ -51,8 +51,12 @@ module audio_visualiser_top #(
     logic signed [15:0] source_real;    // The real part of the frequency amplitude
     logic signed [15:0] source_imag;    // The imaginary part of the frequency amplitude
 
-    // Placeholder, will use source_exp in video logic for deciding height of EQ bars
+    // Placeholder, will use these in video logic rendering EQ bars for the audio visualiser
     logic [5:0] source_exp;
+    logic [15:0] magnitude;             // The calculated frequency amplitude
+    logic mag_valid;                    // Pulses high when 'magnitude' is ready
+    logic mag_sop;                      // Aligned with frequency bin 0
+    logic mag_eop;                      // Aligned with frequency bin 1023
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -124,6 +128,20 @@ module audio_visualiser_top #(
 		.source_imag(source_imag),
 		.source_exp(source_exp)
 	);
-    
+
+    magnitude_calc u_magnitude_calc (
+        .board_clk(board_clk),
+        .resetn(resetn),
+        .source_real(source_real),
+        .source_imag(source_imag),
+        .source_valid(source_valid),
+        .source_sop(source_sop),
+        .source_eop(source_eop),
+        .magnitude(magnitude),
+        .mag_valid(mag_valid),
+        .mag_sop(mag_sop),
+        .mag_eop(mag_eop)
+    );
+
 
 endmodule
