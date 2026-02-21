@@ -38,11 +38,21 @@ module audio_visualiser_top #(
     logic [11:0] rdusedw;               // How many words (1 word = 16 bits) are currently in the FIFO
 
     // u_fft_controller <--> u_audio_fft
-    logic sink_ready;                   // Flag from the FFT telling us it is ready to read data
-    logic [15:0] sink_real;             // The real part of the audio we want to send to the FFT module
     logic sink_valid;                   // Requests the FFT to read our audio data
+    logic sink_ready;                   // Flag from the FFT telling us it is ready to read data
     logic sink_sop;                     // Pulses at the start of an audio packet
     logic sink_eop;                     // Pulses at the end of an audio packet
+    logic [15:0] sink_real;             // The real part of the audio we want to send to the FFT module
+
+    // u_audio_fft <--> u_magnitude_calc
+    logic source_valid;                 // Flag to indicate the FFT has sent valid output
+    logic source_sop;                   // Start of packet (frequency bin 0)
+    logic source_eop;                   // End of packet (frequency bin 1023)
+    logic signed [15:0] source_real;    // The real part of the frequency amplitude
+    logic signed [15:0] source_imag;    // The imaginary part of the frequency amplitude
+
+    // Placeholder, will use source_exp in video logic for deciding height of EQ bars
+    logic [5:0] source_exp;
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -94,5 +104,26 @@ module audio_visualiser_top #(
         .sink_sop(sink_sop),
         .sink_eop(sink_eop)
     );
+
+    audio_fft u0 (
+		.clk(board_clk),
+		.reset_n(resetn),
+		.sink_valid(sink_valid),
+		.sink_ready(sink_ready>),
+		.sink_error(2'b0),
+		.sink_sop(sink_sop),
+		.sink_eop(sink_eop),
+		.sink_real(sink_real),
+		.sink_imag(16'b0),
+		.inverse(1'b0),
+		.source_valid(source_valid),
+		.source_ready(1'b1),
+		.source_sop(source_sop),
+		.source_eop(source_eop),
+		.source_real(source_real),
+		.source_imag(source_imag),
+		.source_exp(source_exp)
+	);
+    
 
 endmodule
