@@ -5,7 +5,7 @@ module ethernet_handler #(
     parameter FPGA_IP = 32'hC0_00_02_92,
     parameter FPGA_PORT = 16'd5005
     )(
-    input logic clk,                    // 50MHz LAN8720 clock
+    input logic phy_clk,                    // 50MHz LAN8720 clock
     input logic resetn,                 // Active low reset button
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
