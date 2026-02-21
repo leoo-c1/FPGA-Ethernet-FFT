@@ -1,4 +1,4 @@
-module magnitude_calc (
+module amplitude_calc (
     input logic board_clk,                  // 50MHz FPGA onboard clock
     input logic resetn,                     // Active low reset button
 
@@ -8,8 +8,8 @@ module magnitude_calc (
     input logic source_sop,                 // Start of packet (frequency bin 0)
     input logic source_eop,                 // End of packet (frequency bin 1023)
 
-    output logic [15:0] magnitude,          // The calculated frequency amplitude
-    output logic mag_valid,                 // Pulses high when 'magnitude' is ready
+    output logic [15:0] amplitude,          // The calculated frequency amplitude
+    output logic mag_valid,                 // Pulses high when 'amplitude' is ready
     output logic mag_sop,                   // Aligned with frequency bin 0
     output logic mag_eop                    // Aligned with frequency bin 1023
     );
@@ -34,7 +34,7 @@ module magnitude_calc (
 
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
-            magnitude <= 16'b0;
+            amplitude <= 16'b0;
             mag_valid <= 1'b0;
             mag_sop <= 1'b0;
             mag_eop <= 1'b0;
@@ -81,12 +81,12 @@ module magnitude_calc (
                 min_val <= abs_real;
             end
 
-            /* Using alpha max + beta min algorithm to approximate magnitude
-            Magnitude is approx. alpha*max(|Re|, |Im|) + beta*min(|Re|, |Im|)
+            /* Using alpha max + beta min algorithm to approximate amplitude
+            Amplitude is approx. alpha*max(|Re|, |Im|) + beta*min(|Re|, |Im|)
             Using alpha = 1, beta = 1/4 which means shifting min(|Re|, |Im|) to the right by 2 bits
             */
 
-            magnitude <= max_val + (min_val >> 2'd2);
+            amplitude <= max_val + (min_val >> 2'd2);
         end
     end
 
