@@ -24,8 +24,8 @@ module ram_writer (
             if (mag_valid) begin
                 wren <= 1'b1;
                 data <= magnitude;
-                // If this is the last magnitude we receive, go back to the first address in RAM
-                if (mag_eop)
+                // If this is the first magnitude we receive, go back to the first address in RAM
+                if (mag_sop)
                     wraddress <= 1'b0;
 
                 else 
