@@ -18,6 +18,8 @@ module ram_writer (
             wraddress <= 10'd0;
             wren <= 1'b0;
         end else begin
+            // Default to write enable being low
+            wren <= 1'b0;
             // Check if magnitude data is available
             if (mag_valid) begin
                 wren <= 1'b1;
