@@ -25,7 +25,7 @@ module fft_controller (
         READING                         // In this state, we are in the process of reading 1024 bytes
     } read_state;
 
-    read_state
+    read_state state;
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
     logic read_active;                  // Flag for when we are actively reading data
