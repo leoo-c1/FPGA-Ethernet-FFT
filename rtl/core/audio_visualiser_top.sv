@@ -113,7 +113,7 @@ module audio_visualiser_top #(
 		.clk(board_clk),
 		.reset_n(resetn),
 		.sink_valid(sink_valid),
-		.sink_ready(sink_ready>),
+		.sink_ready(sink_ready),
 		.sink_error(2'b0),
 		.sink_sop(sink_sop),
 		.sink_eop(sink_eop),
