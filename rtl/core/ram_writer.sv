@@ -12,27 +12,22 @@ module ram_writer (
     output logic wren                       // Enables writing to the RAM when high
     );
 
-    logic [9:0] mag_counter;
-
-    assign wr_address = mag_counter;
-
-    always_ff @ (posedge clk or negedge resetn) begin
+    always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             data <= 16'b0;
             wraddress <= 10'd0;
             wren <= 1'b0;
-            mag_counter <= 10'b0;
         end else begin
             // Check if magnitude data is available
             if (mag_valid) begin
                 wren <= 1'b1;
                 data <= magnitude;
-                // If this is the last magnitude we receive, restart our counter
+                // If this is the last magnitude we receive, go back to the first address in RAM
                 if (mag_eop)
-                    mag_counter <= 1'b0;
+                    wraddress <= 1'b0;
 
                 else 
-                    mag_counter <= mag_counter + 10'd1;     // Increment our counter for every received magnitude
+                    wraddress <= wraddress + 10'd1;     // Increment our write address for every received magnitude
             end
         end
     end
