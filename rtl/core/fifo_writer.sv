@@ -23,7 +23,7 @@ module fifo_writer (
     always_ff @ (posedge phy_clk or negedge resetn) begin
         // On startup or if the reset button is pressed
         if (!resetn) begin
-            data_storage <= 16'b0;
+            data_storage <= 8'b0;
             chunk_count <= 1'b0;
             wrreq <= 1'b0;
             fifo_data <= 16'b0;
