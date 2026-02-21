@@ -1,6 +1,6 @@
 module magnitude_calc (
-    input logic board_clk,              // 50MHz FPGA onboard clock
-    input logic resetn,                 // Active low reset button
+    input logic board_clk,                  // 50MHz FPGA onboard clock
+    input logic resetn,                     // Active low reset button
 
     input logic signed [15:0] source_real,  // The real part of the frequency amplitude
     input logic signed [15:0] source_imag,  // The imaginary part of the frequency amplitude
