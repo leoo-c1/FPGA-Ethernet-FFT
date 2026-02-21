@@ -1,4 +1,4 @@
-module vga_driver (
+module vga_driver_reference (
     input clk,              // 50MHz clock
     input rst,              // Reset button
 
