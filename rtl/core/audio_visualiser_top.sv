@@ -67,6 +67,8 @@ module audio_visualiser_top #(
     logic [15:0] q_amplitude;           // The stored amplitude value in ram      
     logic [9:0] rdaddress;              // The address in RAM that we want to read from
 
+    // u_vga_sync <--> u_vga_driver
+
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
         .FPGA_IP(FPGA_IP),
@@ -174,6 +176,19 @@ module audio_visualiser_top #(
         .wren(wren),
         .q(q_amplitude)
     );
+
+    vga_driver u_vga_driver (
+        .pll_clk(),
+        .resetn(resetn),
+        .pixel_x(),
+        .pixel_y(),
+        .video_on(),
+        .q_amplitude(q_amplitude),
+        .rdaddress(rdaddress),
+        .red(),
+        .green(),
+        .blue()
+    )
 
 
 endmodule
