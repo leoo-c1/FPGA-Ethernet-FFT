@@ -28,7 +28,16 @@ module fft_controller (
     read_state state;
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
-    logic read_active;                  // Flag for when we are actively reading data
+    
+    // Delay for FIFO to register the read request (stage 1)
+    logic valid_d1;
+    logic sop_d1;
+    logic eop_d1;
+
+    // Delay to align with FIFO output (stage 2)
+    logic valid_d2;
+    logic sop_d2;
+    logic eop_d2;
 
     // State machine and FIFO read request
     always_ff @ (posedge board_clk or negedge resetn) begin
@@ -36,12 +45,36 @@ module fft_controller (
             state <= IDLE;
             rdreq <= 1'b0;
             word_counter <= 1'b0;
-            read_active  <= 1'b0;
+            valid_d1 <= 1'b0;
+            sop_d1 <= 1'b0;
+            eop_d1 <= 1'b0;
+            valid_d2 <= 1'b0;
+            sop_d2 <= 1'b0;
+            eop_d2 <= 1'b0;
+            sink_valid <= 1'b0;
+            sink_sop <= 1'b0;
+            sink_eop <= 1'b0;
+            sink_real <= 16'd0;
 
         end else begin
             // Default to not requesting data
             rdreq <= 1'b0;
-            read_active  <= 1'b0;
+
+            // Move stage 1 into stage 2
+            valid_d2 <= valid_d1;
+            sop_d2   <= sop_d1;
+            eop_d2   <= eop_d1;
+            
+            // Output stage 2 to the FFT
+            sink_valid <= valid_d2;
+            sink_sop   <= sop_d2;
+            sink_eop   <= eop_d2;
+            sink_real  <= fifo_q; 
+
+            // Default stage 1 to 0
+            valid_d1 <= 1'b0;
+            sop_d1   <= 1'b0;
+            eop_d1   <= 1'b0;
 
             if (state == IDLE) begin
                 word_counter <= 10'd0;
@@ -55,7 +88,11 @@ module fft_controller (
                 // Only read if the FFT is ready to accept data
                 if (sink_ready) begin
                     rdreq <= 1'b1;
-                    read_active <= 1'b1;
+                    
+                    // Update flags before word_counter increments
+                    valid_d1 <= 1'b1;
+                    sop_d1 <= (word_counter == 10'd0);
+                    eop_d1 <= (word_counter == 10'd1023);
 
                     if (word_counter < 10'd1023)
                         word_counter <= word_counter + 10'd1;
@@ -64,23 +101,6 @@ module fft_controller (
                 end
             end
 
-        end
-    end
-
-    // FFT sending
-    always_ff @ (posedge board_clk or negedge resetn) begin
-        if (!resetn) begin
-            sink_valid <= 1'b0;
-            sink_sop <= 1'b0;
-            sink_eop <= 1'b0;
-            sink_real <= 16'd0;
-
-        end else begin
-            sink_real <= fifo_q;
-            sink_valid <= read_active;
-
-            sink_sop <= read_active && (word_counter == 10'd0);
-            sink_eop <= read_active && (word_counter == 10'd1023);
         end
     end
 
