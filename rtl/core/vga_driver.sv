@@ -18,38 +18,44 @@ module vga_driver (
     logic [8:0] scaled_amplitude;
     assign scaled_amplitude = q_amplitude[4:0] << 3'd4;
 
-    // Delay registers for pixel_x value
-    logic [9:0] pixel_x_delay_1;
-    logic [9:0] pixel_x_delay_2;
-    logic [9:0] pixel_x_delay_3;
+    // Delay registers for pixel_y value
+    logic [9:0] pixel_y_delay_1;
+    logic [9:0] pixel_y_delay_2;
 
-    logic [9:0] delayed_pixel_x;
+    // Delay registers for video_on signal
+    logic vid_delay_1;
+    logic vid_delay_2;
 
     always_ff @ (posedge pll_clk or negedge resetn) begin
         if (!resetn) begin
             rdaddress <= 10'b0;
+            pixel_y_delay_1 <= 10'b0;
+            pixel_y_delay_2 <= 10'b0;
+            vid_delay_1 <= 1'b0;
+            vid_delay_2 <= 1'b0;
             red <= 1'b0;
             green <= 1'b0;
             blue <= 1'b0;
         end else begin
-            // Shift register (4 clock cycles) for pixel_x value
-            pixel_x_delay_1 <= pixel_x;
-            pixel_x_delay_2 <= pixel_x_delay_1;
-            pixel_x_delay_3 <= pixel_x_delay_2;
-            delayed_pixel_x <= pixel_x_delay_3;
+            // Shift register (2 clock cycles) for pixel_y value
+            pixel_y_delay_1 <= pixel_y;
+            pixel_y_delay_2 <= pixel_y_delay_1;
 
-            // Reading the delayed pixel_x value to account RAM read time
-            if (delayed_pixel_x < 639) begin
+            // Shift register (2 clock cycles) for video_on signal
+            vid_delay_1 <= video_on;
+            vid_delay_2 <= vid_delay_1;
+
+            if (pixel_x < 639) begin
                 // Approximate multiplication by 1.6 (approx. 205/128)
-                rdaddress <= (205*(delayed_pixel_x)) >> 3'd7;
-            end else if (delayed_pixel_x == 10'd799) begin
+                rdaddress <= (205*(pixel_x)) >> 3'd7;
+            end else if (pixel_x == 10'd799) begin
                 // On the very last pixel, schedule a read from the first memory address
                 rdaddress <= 10'b0;
             end
 
-            if (video_on) begin
-                // Measure from the bottom of the screen
-                if (10'd479 - pixel_y < scaled_amplitude) begin
+            if (vid_delay_2) begin
+                // Measure from the bottom of the screen, use delayed pixel_y coordinate
+                if (10'd479 - pixel_y_delay_2 < scaled_amplitude) begin
                     // Colour the bar white
                     red <= 1'b1;
                     green <= 1'b1;
