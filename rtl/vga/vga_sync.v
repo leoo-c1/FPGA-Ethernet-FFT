@@ -1,8 +1,8 @@
 module vga_sync (
-    input wire clk,         // 50MHz clock
-    input wire rst,         // Reset button
+    input wire board_clk,         // 50MHz clock
+    input wire resetn,         // Reset button
 
-    output wire clk_0,      // 25.175MHz divided clock
+    output wire pll_clk,      // 25.175MHz PLL clock
 
     output reg h_sync,      // Horizontal sync signal
     output reg v_sync,      // Vertical sync signal
@@ -16,9 +16,9 @@ module vga_sync (
     wire pll_locked;
 
     sys_pll pll_inst (
-        .inclk0(clk),       // 50MHz input clock
+        .inclk0(board_clk), // 50MHz input clock
         .rst(rst),          // Reset button
-        .c0(clk_0),         // 25.175MHz output clock
+        .c0(pll_clk),       // 25.175MHz output clock
         .locked(pll_locked)
     );
 
@@ -37,12 +37,12 @@ module vga_sync (
     reg [9:0] h_count = 0;          // Tracks horizontal pixel position
     reg [9:0] v_count = 0;          // Counts the number of hsync signals
 
-    always @ (posedge clk_0) begin
+    always @ (posedge pll_clk) begin
         pixel_x <= h_count;         // Update horizontal pixel coordinates
         pixel_y <= v_count;         // Update vertical pixel coordinates
         video_on <= (h_count < h_video) && (v_count < v_video);
 
-        if (!rst) begin             // If the reset button is pressed, reset all signals
+        if (!resetn) begin          // If the reset button is pressed, reset all signals
             h_count <= 0;
             v_count <= 0;
             h_sync <= 1'b1;
