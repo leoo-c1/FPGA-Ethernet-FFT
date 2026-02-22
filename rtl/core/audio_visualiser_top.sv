@@ -52,9 +52,8 @@ module audio_visualiser_top #(
     logic signed [15:0] source_imag;    // The imaginary part of the frequency amplitude
     logic [5:0] source_exp;             // The exponent of the block-floating-point representation of source
 
-    // Placeholder, will use these in video logic rendering EQ bars for the audio visualiser
-    logic [5:0] source_exp;
-    logic [15:0] amplitude;             // The calculated frequency amplitude
+    // u_amplitude_calc <--> u_ram_writer
+    logic [15:0] amplitude;             // Frequency amplitude (after exponent and logarithmic scaling)
     logic amp_valid;                    // Pulses high when 'amplitude' is ready
     logic amp_sop;                      // Aligned with frequency bin 0
     logic amp_eop;                      // Aligned with frequency bin 1023
@@ -143,6 +142,18 @@ module audio_visualiser_top #(
         .amp_valid(amp_valid),
         .amp_sop(amp_sop),
         .amp_eop(amp_eop)
+    );
+
+    ram_writer u_ram_writer (
+        .board_clk(board_clk),
+        .resetn(resetn),
+        .amplitude(amplitude),
+        .amp_valid(amp_valid),
+        .amp_sop(amp_sop),
+        .amp_eop(amp_eop),
+        .data(data),
+        .wraddress(wraddress),
+        .wren(wren)
     );
 
 
