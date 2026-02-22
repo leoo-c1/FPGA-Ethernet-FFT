@@ -63,6 +63,10 @@ module audio_visualiser_top #(
     logic [9:0] wraddress;              // Memory address to write to in the RAM
     logic wren;                         // Enables writing to the RAM when high
 
+    // u_amplitude_ram <--> u_vga_driver
+    logic [15:0] q_amplitude;           // The stored amplitude value in ram      
+    logic [9:0] rdaddress;              // The address in RAM that we want to read from
+
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
         .FPGA_IP(FPGA_IP),
@@ -163,12 +167,12 @@ module audio_visualiser_top #(
 
     amplitude_ram u_amplitude_ram (
         .data(data),
-        .rdaddress(),
+        .rdaddress(rdaddress),
         .rdclock(),
         .wraddress(wraddress),
         .wrclock(board_clk),
         .wren(wren),
-        .q()
+        .q(q_amplitude)
     );
 
 
