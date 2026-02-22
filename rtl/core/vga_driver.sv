@@ -15,6 +15,16 @@ module vga_driver (
     output logic blue                   // Pixel blue value (single bit, 0v or 0.7v)
     );
 
+    logic [8:0] scaled_amplitude;
+    assign scaled_amplitude = q_amplitude[4:0] << 3'd4;
+
+    // Delay registers for pixel_x value
+    logic [9:0] pixel_x_delay_1;
+    logic [9:0] pixel_x_delay_2;
+    logic [9:0] pixel_x_delay_3;
+
+    logic [9:0] delayed_pixel_x;
+
     always_ff @ (posedge pll_clk or negedge resetn) begin
         if (!resetn) begin
             rdaddress <= 10'b0;
@@ -22,17 +32,24 @@ module vga_driver (
             green <= 1'b0;
             blue <= 1'b0;
         end else begin
-            // Reading from the RAM takes one clock cycle, so read for upcoming pixel_x
-            if (pixel_x < 639) begin
+            // Shift register (4 clock cycles) for pixel_x value
+            pixel_x_delay_1 <= pixel_x;
+            pixel_x_delay_2 <= pixel_x_delay_1;
+            pixel_x_delay_3 <= pixel_x_delay_2;
+            delayed_pixel_x <= pixel_x_delay_3;
+
+            // Reading the delayed pixel_x value to account RAM read time
+            if (delayed_pixel_x < 639) begin
                 // Approximate multiplication by 1.6 (approx. 205/128)
-                rdaddress <= (205*(pixel_x + 1'b1)) >> 3'd7;
-            end else if (pixel_x == 10'd799) begin
+                rdaddress <= (205*(delayed_pixel_x)) >> 3'd7;
+            end else if (delayed_pixel_x == 10'd799) begin
                 // On the very last pixel, schedule a read from the first memory address
                 rdaddress <= 10'b0;
             end
 
             if (video_on) begin
-                if (pixel_y < q_amplitude) begin
+                // Measure from the bottom of the screen
+                if (10'd479 - pixel_y < scaled_amplitude) begin
                     // Colour the bar white
                     red <= 1'b1;
                     green <= 1'b1;
