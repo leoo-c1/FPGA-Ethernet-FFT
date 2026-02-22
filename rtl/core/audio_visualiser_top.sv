@@ -194,5 +194,15 @@ module audio_visualiser_top #(
         .blue(blue)
     )
 
+    vga_sync u_vga_sync (
+        .board_clk(board_clk),
+        .resetn(resetn),
+        .pll_clk(pll_clk),
+        .h_sync(h_sync),
+        .v_sync(v_sync),
+        .pixel_x(pixel_x),
+        .pixel_y(pixel_y),
+        .video_on(video_on)
+    );
 
 endmodule
