@@ -58,6 +58,11 @@ module audio_visualiser_top #(
     logic amp_sop;                      // Aligned with frequency bin 0
     logic amp_eop;                      // Aligned with frequency bin 1023
 
+    // u_ram_writer <--> u_amplitude_ram
+    logic [15:0] data;                  // Data to write to the ram
+    logic [9:0] wraddress;              // Memory address to write to in the RAM
+    logic wren;                         // Enables writing to the RAM when high
+
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
         .FPGA_IP(FPGA_IP),
@@ -154,6 +159,16 @@ module audio_visualiser_top #(
         .data(data),
         .wraddress(wraddress),
         .wren(wren)
+    );
+
+    amplitude_ram u_amplitude_ram (
+        .data(data),
+        .rdaddress(),
+        .rdclock(),
+        .wraddress(wraddress),
+        .wrclock(board_clk),
+        .wren(wren),
+        .q()
     );
 
 
