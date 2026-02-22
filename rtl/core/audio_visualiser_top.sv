@@ -192,7 +192,7 @@ module audio_visualiser_top #(
         .red(red),
         .green(green),
         .blue(blue)
-    )
+    );
 
     vga_sync u_vga_sync (
         .board_clk(board_clk),
