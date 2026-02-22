@@ -43,6 +43,10 @@ module vga_driver (
                     green <= 1'b0;
                     blue <= 1'b0;
                 end
+            end else begin
+                red <= 1'b0;
+                green <= 1'b0;
+                blue <= 1'b0;
             end
 
         end
