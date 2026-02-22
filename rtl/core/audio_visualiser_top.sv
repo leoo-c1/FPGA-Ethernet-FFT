@@ -50,6 +50,7 @@ module audio_visualiser_top #(
     logic source_eop;                   // End of packet (frequency bin 1023)
     logic signed [15:0] source_real;    // The real part of the frequency amplitude
     logic signed [15:0] source_imag;    // The imaginary part of the frequency amplitude
+    logic [5:0] source_exp;             // The exponent of the block-floating-point representation of source
 
     // Placeholder, will use these in video logic rendering EQ bars for the audio visualiser
     logic [5:0] source_exp;
@@ -137,6 +138,7 @@ module audio_visualiser_top #(
         .source_valid(source_valid),
         .source_sop(source_sop),
         .source_eop(source_eop),
+        .source_exp(source_exp),
         .amplitude(amplitude),
         .amp_valid(amp_valid),
         .amp_sop(amp_sop),
