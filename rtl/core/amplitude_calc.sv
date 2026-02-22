@@ -134,6 +134,8 @@ module amplitude_calc (
             
             else
                 raw_amplitude <= base_amplitude >> delayed_exp;
+
+            amplitude <= {11'b0, log_index};
         end
     end
 
@@ -143,50 +145,52 @@ module amplitude_calc (
     logic [3:0] val_4;
     logic [1:0] val_2;
 
+    logic [4:0] log_index;
+
     always_comb begin
         val_32 = {1'b0, raw_amplitude}; // Pad to 32 bits
 
         // Find the 16s place
         if (| val_32[31:16]) begin
-            amplitude[4] = 1'b1;
+            log_index[4] = 1'b1;
             val_16 = val_32[31:16]; // The 1 is in the top half, so keep the top half
         end else begin
-            amplitude[4] = 1'b0;
+            log_index[4] = 1'b0;
             val_16 = val_32[15:0];  // The 1 is in the bottom half, so keep the bottom half
         end
 
         // Find the 8s place
         if (| val_16[15:8]) begin
-            amplitude[3] = 1'b1;
+            log_index[3] = 1'b1;
             val_8 = val_16[15:8];
         end else begin
-            amplitude[3] = 1'b0;
+            log_index[3] = 1'b0;
             val_8 = val_16[7:0];
         end
 
         // Find the 4s place
         if (| val_8[7:4]) begin
-            amplitude[2] = 1'b1;
+            log_index[2] = 1'b1;
             val_4 = val_8[7:4];
         end else begin
-            amplitude[2] = 1'b0;
+            log_index[2] = 1'b0;
             val_4 = val_8[3:0];
         end
 
         // Find the 2s place
         if (| val_4[3:2]) begin
-            amplitude[1] = 1'b1;
+            log_index[1] = 1'b1;
             val_2 = val_4[3:2];
         end else begin
-            amplitude[1] = 1'b0;
+            log_index[1] = 1'b0;
             val_2 = val_4[1:0];
         end
 
         // Find the 1s place
         if (val_2[1])
-            amplitude[0] = 1'b1;
+            log_index[0] = 1'b1;
         else
-            amplitude[0] = 1'b0;
+            log_index[0] = 1'b0;
     end
 
 endmodule
