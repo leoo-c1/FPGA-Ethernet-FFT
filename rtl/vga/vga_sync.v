@@ -1,24 +1,24 @@
 module vga_sync (
-    input wire board_clk,         // 50MHz clock
-    input wire resetn,         // Reset button
+    input wire board_clk,           // 50MHz FPGA onboard clock
+    input wire resetn,              // Reset button
 
-    output wire pll_clk,      // 25.175MHz PLL clock
+    output wire pll_clk,            // 25.175MHz PLL clock
 
-    output reg h_sync,      // Horizontal sync signal
-    output reg v_sync,      // Vertical sync signal
+    output reg h_sync,              // Horizontal sync signal
+    output reg v_sync,              // Vertical sync signal
 
-    output reg [9:0] pixel_x,   // Horizontal pixel coordinate (from 0)
-    output reg [9:0] pixel_y,   // Vertical pixel coordinate (from 0)
+    output reg [9:0] pixel_x,       // Horizontal pixel coordinate (from 0)
+    output reg [9:0] pixel_y,       // Vertical pixel coordinate (from 0)
 
-    output reg video_on     // Whether or not we are in the active video region
+    output reg video_on             // Whether or not we are in the active video region
     );
 
     wire pll_locked;
 
     sys_pll pll_inst (
-        .inclk0(board_clk), // 50MHz input clock
-        .rst(rst),          // Reset button
-        .c0(pll_clk),       // 25.175MHz output clock
+        .inclk0(board_clk),         // 50MHz input clock
+        .rst(rst),                  // Reset button
+        .c0(pll_clk),               // 25.175MHz output clock
         .locked(pll_locked)
     );
 
@@ -30,7 +30,7 @@ module vga_sync (
 
     // Vertical timing values (in lines):
     parameter v_video = 480;        // Active video
-    parameter v_frontp = 7;        // Front porch
+    parameter v_frontp = 7;         // Front porch
     parameter v_pulsewidth = 2;     // Sync pulse
     parameter v_backp = 35;         // Back porch
 
