@@ -17,7 +17,7 @@ module vga_sync (
 
     sys_pll pll_inst (
         .inclk0(board_clk),         // 50MHz input clock
-        .rst(rst),                  // Reset button
+        .rst(resetn),               // Reset button
         .c0(pll_clk),               // 25.175MHz output clock
         .locked(pll_locked)
     );
