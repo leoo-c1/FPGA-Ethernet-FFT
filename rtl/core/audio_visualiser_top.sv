@@ -68,6 +68,10 @@ module audio_visualiser_top #(
     logic [9:0] rdaddress;              // The address in RAM that we want to read from
 
     // u_vga_sync <--> u_vga_driver
+    logic pll_clk;                      // 25.175MHz PLL clock
+    logic [9:0] pixel_x;                // Horizontal pixel coordinate (from 0)
+    logic [9:0] pixel_y;                // Vertical pixel coordinate (from 0)
+    logic video_on;                     // Whether or not we are in the active video region
 
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
@@ -178,16 +182,16 @@ module audio_visualiser_top #(
     );
 
     vga_driver u_vga_driver (
-        .pll_clk(),
+        .pll_clk(pll_clk),
         .resetn(resetn),
-        .pixel_x(),
-        .pixel_y(),
-        .video_on(),
+        .pixel_x(pixel_x),
+        .pixel_y(pixel_y),
+        .video_on(video_on),
         .q_amplitude(q_amplitude),
         .rdaddress(rdaddress),
-        .red(),
-        .green(),
-        .blue()
+        .red(red),
+        .green(green),
+        .blue(blue)
     )
 
 
