@@ -174,7 +174,7 @@ module audio_visualiser_top #(
     amplitude_ram u_amplitude_ram (
         .data(data),
         .rdaddress(rdaddress),
-        .rdclock(),
+        .rdclock(pll_clk),
         .wraddress(wraddress),
         .wrclock(board_clk),
         .wren(wren),
