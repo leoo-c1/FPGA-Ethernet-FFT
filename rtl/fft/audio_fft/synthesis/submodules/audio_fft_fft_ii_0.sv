@@ -33,7 +33,7 @@ module audio_fft_fft_ii_0 (
 	output [15 : 0] source_imag
 	);
 
-	asj_fft_si_se_so_b #(
+	asj_fft_si_se_so_bb #(
 		.device_family("Cyclone IV E"),
 		.nps(1024),
 		.bfp(1),
@@ -56,7 +56,7 @@ module audio_fft_fft_ii_0 (
 		.rfc2("audio_fft_fft_ii_0_2n1024cos.hex"),
 		.rfc3("audio_fft_fft_ii_0_3n1024cos.hex")
 	)
-	asj_fft_si_se_so_b_inst (
+	asj_fft_si_se_so_bb_inst (
 		.clk(clk),
 		.clk_ena(1'b1),
 		.reset_n(reset_n),

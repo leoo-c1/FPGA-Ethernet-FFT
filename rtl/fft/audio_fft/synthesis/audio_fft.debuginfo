@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="audio_fft" kind="system" version="25.1" fabric="QSYS">
  <!-- Format version 25.1 1129 (Future versions may contain additional information.) -->
- <!-- 2026.02.22.00:35:22 -->
+ <!-- 2026.02.24.00:09:35 -->
  <!-- A collection of modules and connections -->
  <parameter name="clockCrossingAdapter">
   <type>com.altera.sopcmodel.ensemble.EClockAdapter</type>
@@ -53,7 +53,7 @@
  </parameter>
  <parameter name="generationId">
   <type>int</type>
-  <value>1771680921</value>
+  <value>1771852174</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>true</visible>
@@ -169,7 +169,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="data_flow">
    <type>java.lang.String</type>
-   <value>Burst</value>
+   <value>Buffered Burst</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -305,7 +305,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="CALC_LATENCY">
    <type>int</type>
-   <value>3162</value>
+   <value>1291</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -313,7 +313,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="THROUGHPUT_LATENCY">
    <type>int</type>
-   <value>1113</value>
+   <value>1103</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -646,5 +646,5 @@ parameters are a RESULT of the module parameters. -->
   <version>25.1</version>
  </plugin>
  <reportVersion>25.1 1129</reportVersion>
- <uniqueIdentifier>38186827E9450000019C80697881</uniqueIdentifier>
+ <uniqueIdentifier>38186827E9450000019C8A9E9670</uniqueIdentifier>
 </EnsembleReport>

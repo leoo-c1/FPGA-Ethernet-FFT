@@ -2,7 +2,7 @@ set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_NAM
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_VERSION "25.1"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TOOL_ENV "Qsys"
 set_global_assignment -library "audio_fft" -name SOPCINFO_FILE [file join $::quartus(qip_path) "../../audio_fft.sopcinfo"]
-set_global_assignment -entity "audio_fft" -library "audio_fft" -name SLD_INFO "QSYS_NAME audio_fft HAS_SOPCINFO 1 GENERATION_ID 1771680921"
+set_global_assignment -entity "audio_fft" -library "audio_fft" -name SLD_INFO "QSYS_NAME audio_fft HAS_SOPCINFO 1 GENERATION_ID 1771852174"
 set_global_assignment -library "audio_fft" -name MISC_FILE [file join $::quartus(qip_path) "../audio_fft.cmp"]
 set_global_assignment -library "audio_fft" -name SLD_FILE [file join $::quartus(qip_path) "audio_fft.debuginfo"]
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_TARGETED_DEVICE_FAMILY "Cyclone IV E"
@@ -15,7 +15,7 @@ set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONEN
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_REPORT_HIERARCHY "On"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_VERSION "MS4w"
-set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTc3MTY4MDkyMQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTc3MTg1MjE3NA==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBJViBF::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::RVA0Q0U2RTIyQzg=::QXV0byBERVZJQ0U="
 set_global_assignment -entity "audio_fft" -library "audio_fft" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfU1BFRURHUkFERQ==::OA==::QXV0byBERVZJQ0VfU1BFRURHUkFERQ=="
@@ -32,7 +32,7 @@ set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_DESCRIPTION "QWx0ZXJhIEZhc3QgRm91cmllciBUcmFuc2Zvcm0gSUk="
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZGVzaWduX2Vudg==::TkFUSVZF::ZGVzaWduX2Vudg=="
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "bGVuZ3Ro::MTAyNA==::TGVuZ3Ro"
-set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZGF0YV9mbG93::QnVyc3Q=::RGF0YSBGbG93"
+set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZGF0YV9mbG93::QnVmZmVyZWQgQnVyc3Q=::RGF0YSBGbG93"
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZGlyZWN0aW9u::QmktZGlyZWN0aW9uYWw=::RGlyZWN0aW9u"
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZGF0YV9yZXA=::QmxvY2sgRmxvYXRpbmcgUG9pbnQ=::UmVwcmVzZW50YXRpb24="
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "aW5fd2lkdGg=::MTY=::RGF0YSBJbnB1dCBXaWR0aA=="
@@ -49,8 +49,8 @@ set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "ZHNwX3Jlc291cmNlX29wdA==::ZmFsc2U=::RFNQIEJsb2NrIFJlc291cmNlIE9wdGltaXphdGlvbg=="
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "aGFyZF9mcA==::ZmFsc2U=::RW5hYmxlIEhhcmQgRmxvYXRpbmcgUG9pbnQgQmxvY2tz"
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "aHlwZXJfb3B0::ZmFsc2U=::SHlwZXIgT3B0aW1pemF0aW9u"
-set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "Q0FMQ19MQVRFTkNZ::MzE2Mg==::Q2FsY3VsYXRpb24gTGF0ZW5jeQ=="
-set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "VEhST1VHSFBVVF9MQVRFTkNZ::MTExMw==::VGhyb3VnaHB1dCBMYXRlbmN5"
+set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "Q0FMQ19MQVRFTkNZ::MTI5MQ==::Q2FsY3VsYXRpb24gTGF0ZW5jeQ=="
+set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "VEhST1VHSFBVVF9MQVRFTkNZ::MTEwMw==::VGhyb3VnaHB1dCBMYXRlbmN5"
 set_global_assignment -entity "audio_fft_fft_ii_0" -library "audio_fft" -name IP_COMPONENT_PARAMETER "c2VsZWN0ZWRfZGV2aWNlX2ZhbWlseQ==::Q3ljbG9uZSBJViBF::c2VsZWN0ZWRfZGV2aWNlX2ZhbWlseQ=="
 
 set_global_assignment -library "audio_fft" -name VERILOG_FILE [file join $::quartus(qip_path) "audio_fft.v"]
