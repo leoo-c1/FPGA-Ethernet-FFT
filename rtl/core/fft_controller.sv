@@ -22,12 +22,14 @@ module fft_controller (
 
     typedef enum logic {
         IDLE,                           // Not reading anything in this state
-        READING                         // In this state, we are in the process of reading 1024 bytes
+        READING,                        // In this state, we are in the process of reading 1024 bytes
+        WAIT_SYNC                       // In this state we are using a delay to let the FIFO catch up
     } read_state;
 
     read_state state;
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
+    logic [3:0] wait_counter = 0;       // Counts how many clock cycles we have been waiting for the FIFO to catch up
     
     // Delay for FIFO to register the read request (stage 1)
     logic valid_d1;
@@ -44,7 +46,8 @@ module fft_controller (
         if (!resetn) begin
             state <= IDLE;
             rdreq <= 1'b0;
-            word_counter <= 1'b0;
+            word_counter <= 10'b0;
+            wait_counter <= 4'd0;
             valid_d1 <= 1'b0;
             sop_d1 <= 1'b0;
             eop_d1 <= 1'b0;
@@ -97,8 +100,16 @@ module fft_controller (
                     if (word_counter < 10'd1023)
                         word_counter <= word_counter + 10'd1;
                     else
-                        state <= IDLE;
+                        state <= WAIT_SYNC;
+                        wait_counter <= 4'd0;
                 end
+            
+            // Wait 10 clock cycles for the FIFO to catch up
+            end else if (state == WAIT_SYNC) begin
+                if (wait_counter < 4'd10)
+                    wait_counter <= wait_counter + 4'd1;
+                else
+                    state <= IDLE;
             end
 
         end
