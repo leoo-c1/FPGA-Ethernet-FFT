@@ -44,7 +44,7 @@ module eth_parser #(
 
     logic [15:0] byte_counter = 0;      // Counts the number of bytes we have received
 
-    always_ff @ (posedge clk or negedge resetn) begin
+    always_ff @ (posedge phy_clk or negedge resetn) begin
         if (!resetn) begin
             state <= IDLE;
             payload <= 8'b0;
