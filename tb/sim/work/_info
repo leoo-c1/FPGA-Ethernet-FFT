@@ -1,0 +1,239 @@
+m255
+K4
+z2
+!s11f vlog 2025.2 2025.05, May 31 2025
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/chinc/FPGA-Ethernet-FFT/tb
+vaudio_fifo
+Z0 !s110 1771848487
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+r1
+!s85 0
+2C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v
+!i10b 1
+!s100 2`AYQfX6cQzLiJo`;DiB92
+IJ?bZC6<aM]ZSf8D?mGCE]1
+Z2 dC:/Users/chinc/FPGA-Ethernet-FFT/tb/sim
+w1771841904
+8C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v
+FC:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v
+!i122 77
+L0 40 60
+Z3 OL;L;2025.2;82
+31
+Z4 !s108 1771848487.000000
+!s107 C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v|
+!s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v|
+!i113 0
+o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z5 tCvgOpt 0 defaultOptions 1085333592
+veth_parser
+Z6 DXx6 sv_std 3 std 0 22 @5XbY]_OacJl=`ToSm<M^0
+Z7 DXx4 work 13 eth_types_pkg 0 22 CCQJKWlNhZ>?IZd]?nVgG2
+DXx4 work 18 eth_parser_sv_unit 0 22 oSnDhU>JamEhkT0HhhSjU1
+Z8 !s110 1771848486
+R1
+r1
+!s85 0
+Z9 2C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv
+!i10b 1
+!s100 ]3Sz1g6Z^AcQG=zg6Z1>P1
+I6OGCnVNnJhUQXP@1I]EM`3
+!s105 eth_parser_sv_unit
+S1
+R2
+Z10 w1771822598
+Z11 8C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv
+Z12 FC:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv
+!i122 75
+L0 3 232
+R3
+31
+Z13 !s108 1771848486.000000
+Z14 !s107 C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv|
+Z15 !s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv|
+!i113 0
+Z16 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R5
+Xeth_parser_sv_unit
+R6
+R7
+R8
+VoSnDhU>JamEhkT0HhhSjU1
+r1
+!s85 0
+R9
+!i10b 1
+!s100 4`3`NeDkHL@Sodb:?j4Tj0
+IoSnDhU>JamEhkT0HhhSjU1
+!i103 1
+S1
+R2
+R10
+R11
+R12
+!i122 75
+Z17 L0 1 0
+R3
+31
+R13
+R14
+R15
+!i113 0
+R16
+R5
+Xeth_types_pkg
+R6
+R8
+VCCQJKWlNhZ>?IZd]?nVgG2
+r1
+!s85 0
+2C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv
+!i10b 1
+!s100 lDiY66d9Azho^=mUmk6Ek0
+ICCQJKWlNhZ>?IZd]?nVgG2
+S1
+R2
+w1771665746
+8C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv
+FC:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv
+!i122 76
+R17
+R3
+31
+R13
+!s107 C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv|
+!s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv|
+!i113 0
+R16
+R5
+vfft_controller
+R6
+R0
+R1
+r1
+!s85 0
+2C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fft_controller.sv
+!i10b 1
+!s100 R`mfcP>ZKk:OYk3UUIjf>1
+I^TM7?o^JmdnfVLUB:f2>:3
+S1
+R2
+w1771848457
+8C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fft_controller.sv
+FC:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fft_controller.sv
+!i122 79
+L0 6 86
+R3
+31
+R4
+!s107 C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fft_controller.sv|
+!s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fft_controller.sv|
+!i113 0
+R16
+R5
+vfifo_writer
+R6
+R8
+R1
+r1
+!s85 0
+2C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv
+!i10b 1
+!s100 =51JP3JfS26k[IU@DoLzX1
+Ibj;ZlKYhK0JC:]X=U3cZ>2
+S1
+R2
+w1771836158
+8C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv
+FC:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv
+!i122 74
+L0 6 57
+R3
+31
+R13
+!s107 C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv|
+!s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv|
+!i113 0
+R16
+R5
+vtb_eth_to_fifo
+R6
+!s110 1771845629
+R1
+r1
+!s85 0
+2C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_eth_to_fifo.sv
+!i10b 1
+!s100 Bz<1Sj6:WP7c8]=YJi;Kj2
+I^SANfb:<bomo`FLoHoHm80
+S1
+R2
+w1771843763
+8C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_eth_to_fifo.sv
+FC:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_eth_to_fifo.sv
+!i122 54
+L0 3 216
+R3
+31
+!s108 1771845629.000000
+!s107 C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_eth_to_fifo.sv|
+!s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_eth_to_fifo.sv|
+!i113 0
+R16
+R5
+vtb_fft_controller
+R6
+R0
+R1
+r1
+!s85 0
+Z18 2C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv
+!i10b 1
+!s100 C<KH[FzoZ02DO6gI6PJiC2
+INd2Si^84:=C<9A9TJZVzz3
+S1
+R2
+w1771847766
+Z19 8C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv
+Z20 FC:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv
+!i122 78
+Z21 L0 3 238
+R3
+31
+R4
+Z22 !s107 C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv|
+Z23 !s90 -F=C:/Users/chinc/FPGA-Arbitrage-Engine/rtl/Arbitrage_Engine/simulation/questa/vlog.opt|-F=|-reportprogress|300|-work|work|-vopt|-sv|-stats=none|C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv|
+!i113 0
+R16
+R5
+vtb_fifo_writer
+R18
+R6
+!s110 1771846950
+!i10b 1
+!s100 hK27Ye[4CzWYCFS3hehAj0
+IooJTC6@L7SDR<Q4Bd1hTP0
+S1
+R2
+w1771846903
+R19
+R20
+!i122 60
+R21
+R1
+R3
+r1
+!s85 0
+31
+!s108 1771846950.000000
+R22
+R23
+!i113 0
+R16
+R5
