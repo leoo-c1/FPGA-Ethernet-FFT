@@ -77,7 +77,7 @@ bool EthSender::sendData(const std::vector<int16_t>& data, uint32_t sample_rate)
         }
 
         else {
-            std::cout << "Sent " << send_result << " bytes" << std::endl;
+            // std::cout << "Sent " << send_result << " bytes" << std::endl;
             // Update sent samples count
             samples_sent += samples_to_send;
 
