@@ -26,7 +26,7 @@ module ram_writer (
                 data <= amplitude;
                 // If this is the first amplitude we receive, go back to the first address in RAM
                 if (amp_sop)
-                    wraddress <= 1'b0;
+                    wraddress <= 10'b0;
 
                 else 
                     wraddress <= wraddress + 10'd1;     // Increment our write address for every received amplitude
