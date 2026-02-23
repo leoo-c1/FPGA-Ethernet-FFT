@@ -99,9 +99,10 @@ module fft_controller (
 
                     if (word_counter < 10'd1023)
                         word_counter <= word_counter + 10'd1;
-                    else
+                    else begin
                         state <= WAIT_SYNC;
                         wait_counter <= 4'd0;
+                    end
                 end
             
             // Wait 10 clock cycles for the FIFO to catch up
