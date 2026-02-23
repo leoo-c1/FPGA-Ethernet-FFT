@@ -20,7 +20,7 @@ module fft_controller (
     output logic sink_eop               // Pulses at the end of an audio packet
     );
 
-    typedef enum [1:0] logic {
+    typedef enum logic [1:0] {
         IDLE,                           // Not reading anything in this state
         READING,                        // In this state, we are in the process of reading 1024 bytes
         WAIT_SYNC                       // In this state we are using a delay to let the FIFO catch up
