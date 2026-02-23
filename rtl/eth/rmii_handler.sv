@@ -16,7 +16,7 @@ module rmii_handler (
 
     logic [7:0] bit_storage;            // Holds onto each received bit until full byte is received
 
-    always_ff @ (posedge clk or negedge resetn) begin
+    always_ff @ (posedge phy_clk or negedge resetn) begin
         if (!resetn) begin              // On reset/startup, reset our collected byte
             received_byte <= 8'b0;
             byte_valid <= 1'b0;
