@@ -2,7 +2,7 @@
 
 module tb_eth_parser;
 
-    logic clk;                  // 50MHz LAN8720 clock
+    logic phy_clk;              // 50MHz LAN8720 clock
     logic resetn;               // Reset button (active low)
 
     logic data_valid;
@@ -19,7 +19,7 @@ module tb_eth_parser;
         .FPGA_IP(32'hC0_00_02_92),
         .FPGA_PORT(16'd5005)
     ) eth_parser_test (
-        .clk(clk),
+        .phy_clk(phy_clk),
         .resetn(resetn),
         .data_valid(data_valid),
         .received_byte(received_byte),
@@ -32,11 +32,11 @@ module tb_eth_parser;
     task send_byte;
         input [7:0] byte_to_send;
         begin
-            @ (posedge clk);
+            @ (posedge phy_clk);
             received_byte <= byte_to_send;
             byte_valid <= 1'b1;
 
-            @ (posedge clk);
+            @ (posedge phy_clk);
             byte_valid <= 1'b0;
         end
     endtask
@@ -136,17 +136,17 @@ module tb_eth_parser;
             send_byte(8'h8E);
             send_byte(8'h8E);
 
-            @ (posedge clk);
+            @ (posedge phy_clk);
             data_valid = 1'b0;      // Make data_valid low after the frame
         end
     endtask
 
     always begin
-        #10 clk = ~clk;         // Generate 50MHz clock signal
+        #10 phy_clk = ~phy_clk;     // Generate 50MHz clock signal
     end
 
     initial begin
-        clk = 0;            // Initially, clock is low
+        phy_clk = 0;            // Initially, clock is low
         resetn = 0;         // Reset is active
         data_valid = 0;
 
