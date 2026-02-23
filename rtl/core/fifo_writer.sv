@@ -39,7 +39,7 @@ module fifo_writer (
                     chunk_count <= 1'b1;
                 // If this is the second chunk we have come across
                 end else begin
-                    fifo_data <= {payload, data_storage};   // Combine the stored data with the data we received
+                    fifo_data <= {data_storage, payload};   // Combine the stored data with the data we received
                     chunk_count <= 1'b0;
                     // Check if the fifo isn't full
                     if (!wr_full)
