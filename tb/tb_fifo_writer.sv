@@ -19,7 +19,7 @@ module tb_fifo_writer;
     logic wrreq;                 // Requests a write operation when high
     logic [15:0] fifo_data;      // The data we write to the fifo
 
-    // audio_fifo output
+    // audio_fifo outputs
     logic wr_full;              // Indicates the fifo is currently full
     logic [11:0] rdusedw;       // Tells us how many 16-bit words are in the FIFO
     logic [15:0] fifo_q;        // The data output of the FIFO
