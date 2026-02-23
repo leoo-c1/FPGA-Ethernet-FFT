@@ -26,7 +26,7 @@ module ethernet_handler #(
     assign tx_en = 1'b0;
 
     rmii_handler byte_receiver (
-        .clk(phy_clk),
+        .phy_clk(phy_clk),
         .resetn(resetn),
         .data_valid(data_valid),
         .rx0(rx0),
@@ -40,7 +40,7 @@ module ethernet_handler #(
         .FPGA_IP(FPGA_IP),
         .FPGA_PORT(FPGA_PORT)
     ) ethernet_parser (
-        .clk(phy_clk),
+        .phy_clk(phy_clk),
         .resetn(resetn),
         .data_valid(data_valid),
         .received_byte(received_byte),

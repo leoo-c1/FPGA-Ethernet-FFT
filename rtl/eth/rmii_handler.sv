@@ -1,5 +1,5 @@
 module rmii_handler (
-    input logic clk,                    // 50MHz LAN8720 clock
+    input logic phy_clk,                // 50MHz LAN8720 clock
     input logic resetn,                 // Reset button (active low)
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
