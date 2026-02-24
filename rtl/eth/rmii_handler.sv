@@ -1,5 +1,5 @@
 module rmii_handler (
-    input logic phy_clk,                // 50MHz LAN8720 clock
+    input logic board_clk,                // 50MHz LAN8720 clock
     input logic resetn,                 // Reset button (active low)
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
@@ -16,7 +16,7 @@ module rmii_handler (
 
     logic [7:0] bit_storage;            // Holds onto each received bit until full byte is received
 
-    always_ff @ (posedge phy_clk or negedge resetn) begin
+    always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin              // On reset/startup, reset our collected byte
             received_byte <= 8'b0;
             byte_valid <= 1'b0;
