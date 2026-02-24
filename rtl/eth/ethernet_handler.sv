@@ -5,7 +5,8 @@ module ethernet_handler #(
     parameter FPGA_IP = 32'hC0_00_02_92,
     parameter FPGA_PORT = 16'd5005
     )(
-    input logic phy_clk,                    // 50MHz LAN8720 clock
+    input logic phy_clk,                // 50MHz LAN8720 clock
+    input logic board_clk,              // 50MHz FPGA onboard clock
     input logic resetn,                 // Active low reset button
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
@@ -28,22 +29,28 @@ module ethernet_handler #(
     logic rx1_sync1;
     logic rx1_sync2;
 
+    // First stage sync
     always_ff @(posedge phy_clk or negedge resetn) begin
         if (!resetn) begin
-            dv_sync1 <= 1'b0;
-            dv_sync2  <= 1'b0;
+            dv_sync1  <= 1'b0;
             rx0_sync1 <= 1'b0;
-            rx0_sync2 <= 1'b0;
             rx1_sync1 <= 1'b0;
+        end else begin
+            dv_sync1  <= data_valid;
+            rx0_sync1 <= rx0;
+            rx1_sync1 <= rx1;
+        end
+    end
+
+    // Second stage sync
+    always_ff @(posedge board_clk or negedge resetn) begin
+        if (!resetn) begin
+            dv_sync2  <= 1'b0;
+            rx0_sync2 <= 1'b0;
             rx1_sync2 <= 1'b0;
         end else begin
-            dv_sync1 <= data_valid;
-            dv_sync2 <= dv_sync1;
-            
-            rx0_sync1 <= rx0;
+            dv_sync2  <= dv_sync1;
             rx0_sync2 <= rx0_sync1;
-            
-            rx1_sync1 <= rx1;
             rx1_sync2 <= rx1_sync1;
         end
     end
@@ -54,7 +61,7 @@ module ethernet_handler #(
     assign tx_en = 1'b0;
 
     rmii_handler byte_receiver (
-        .phy_clk(phy_clk),
+        .board_clk(board_clk),
         .resetn(resetn),
         .data_valid(dv_sync2),
         .rx0(rx0_sync2),
@@ -68,7 +75,7 @@ module ethernet_handler #(
         .FPGA_IP(FPGA_IP),
         .FPGA_PORT(FPGA_PORT)
     ) ethernet_parser (
-        .phy_clk(phy_clk),
+        .board_clk(board_clk),
         .resetn(resetn),
         .data_valid(dv_sync2),
         .received_byte(received_byte),
