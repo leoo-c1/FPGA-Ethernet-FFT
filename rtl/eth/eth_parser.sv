@@ -223,11 +223,13 @@ module eth_parser #(
                 state <= IDLE;
             end
         end else begin
-            // If data valid goes low, go back to the idle state
-            state <= IDLE;
-            payload_valid <= 1'b0;
-            payload_last <= 1'b0;
-            byte_counter <= 0;
+            // Go back to idle if data_valid is gone
+            if (!data_valid) begin
+                state <= IDLE;
+                payload_valid <= 1'b0;
+                payload_last <= 1'b0;
+                byte_counter <= 0;
+            end
         end
     end
 
