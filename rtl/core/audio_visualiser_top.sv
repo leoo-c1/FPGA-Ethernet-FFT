@@ -91,7 +91,7 @@ module audio_visualiser_top #(
     );
 
     fifo_writer u_fifo_writer (
-        .phy_clk(phy_clk),
+        .board_clk(board_clk),
         .resetn(resetn),
         .payload(payload),
         .payload_valid(payload_valid),
@@ -105,7 +105,7 @@ module audio_visualiser_top #(
         .data(fifo_data),
         .rdclk(board_clk),
         .rdreq(rdreq),
-        .wrclk(phy_clk),
+        .wrclk(board_clk),
         .wrreq(wrreq),
         .q(fifo_q),
         .rdusedw(rdusedw),
