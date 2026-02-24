@@ -31,7 +31,7 @@ module ethernet_handler #(
     logic rx1_sync2;
 
     // First stage sync
-    always_ff @(negedge phy_clk or negedge resetn) begin
+    always_ff @(posedge phy_clk or negedge resetn) begin
         if (!resetn) begin
             dv_sync1  <= 1'b0;
             rx0_sync1 <= 1'b0;
