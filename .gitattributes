@@ -5,3 +5,4 @@ fifo/** linguist-generated=true
 
 # Ignore the questa files in language statistics
 tb/sim/** linguist-generated=true
+tb/sim/**/* linguist-generated=true
