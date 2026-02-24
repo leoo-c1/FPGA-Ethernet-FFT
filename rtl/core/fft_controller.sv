@@ -30,6 +30,8 @@ module fft_controller (
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
     logic [3:0] wait_counter = 0;       // Counts how many clock cycles we have been waiting for the FIFO to catch up
+
+    assign sink_real = fifo_q;
     
     // State machine and FIFO read request
     always_ff @ (posedge board_clk or negedge resetn) begin
@@ -41,7 +43,6 @@ module fft_controller (
             sink_valid <= 1'b0;
             sink_sop <= 1'b0;
             sink_eop <= 1'b0;
-            sink_real <= 16'd0;
 
         end else begin
             // Default to not requesting data and flags low
@@ -57,17 +58,15 @@ module fft_controller (
                 if (rdusedw >= 12'd1024)
                     state <= READING;
 
-
             end else if (state == READING) begin
-                // Instantly read and validate in the exact same clock cycle
+                // Latch the show-ahead data and flags regardless of sink_ready
+                sink_valid <= 1'b1;
+                sink_sop <= (word_counter == 10'd0);
+                sink_eop <= (word_counter == 10'd1023);
+
+                // Only advance the FIFO if the FFT accepts the word
                 if (sink_ready) begin
                     rdreq <= 1'b1;
-                    
-                    // Latch the show-ahead data and flags instantly
-                    sink_valid <= 1'b1;
-                    sink_sop <= (word_counter == 10'd0);
-                    sink_eop <= (word_counter == 10'd1023);
-                    sink_real <= fifo_q;
 
                     if (word_counter < 10'd1023)
                         word_counter <= word_counter + 10'd1;

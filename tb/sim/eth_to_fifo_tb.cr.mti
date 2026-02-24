@@ -1,0 +1,43 @@
+C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv {1 {vlog -work work -vopt -sv -stats=none C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_parser.sv
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) 'C:/Users/chinc/FPGA-Ethernet-FFT/tb/sim/eth_to_fifo_tb.mpf' is used as the ini file.
+-- Compiling package eth_parser_sv_unit
+-- Importing package eth_types_pkg
+-- Compiling module eth_parser
+
+Top level modules:
+	eth_parser
+
+} {} {}} C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v {1 {vlog -work work -vopt -stats=none C:/Users/chinc/FPGA-Ethernet-FFT/rtl/fifo/audio_fifo.v
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) 'C:/Users/chinc/FPGA-Ethernet-FFT/tb/sim/eth_to_fifo_tb.mpf' is used as the ini file.
+-- Compiling module audio_fifo
+
+Top level modules:
+	audio_fifo
+
+} {} {}} C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv {1 {vlog -work work -vopt -sv -stats=none C:/Users/chinc/FPGA-Ethernet-FFT/rtl/eth/eth_types_pkg.sv
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) 'C:/Users/chinc/FPGA-Ethernet-FFT/tb/sim/eth_to_fifo_tb.mpf' is used as the ini file.
+-- Compiling package eth_types_pkg
+
+Top level modules:
+	--none--
+
+} {} {}} C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv {1 {vlog -work work -vopt -sv -stats=none C:/Users/chinc/FPGA-Ethernet-FFT/tb/tb_fft_controller.sv
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) 'C:/Users/chinc/FPGA-Ethernet-FFT/tb/sim/eth_to_fifo_tb.mpf' is used as the ini file.
+-- Compiling module tb_fft_controller
+
+Top level modules:
+	tb_fft_controller
+
+} {} {}} C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv {1 {vlog -work work -vopt -sv -stats=none C:/Users/chinc/FPGA-Ethernet-FFT/rtl/core/fifo_writer.sv
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) 'C:/Users/chinc/FPGA-Ethernet-FFT/tb/sim/eth_to_fifo_tb.mpf' is used as the ini file.
+-- Compiling module fifo_writer
+
+Top level modules:
+	fifo_writer
+
+} {} {}}
