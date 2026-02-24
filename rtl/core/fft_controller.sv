@@ -33,24 +33,26 @@ module fft_controller (
 
     assign sink_real = fifo_q;
     
+    // sink_valid is high only when we are in the READING state
+    assign sink_valid = (state == READING);
+    
+    // sink_sop is high only on the very first word (count 0)
+    assign sink_sop = (state == READING) && (word_counter == 10'd0);
+    
+    // sink_eop is high only on the very last word (count 1023)
+    assign sink_eop = (state == READING) && (word_counter == 10'd1023);
+    
+    // Read from FIFO only if we are sending valid data and the FFT is ready to take it
+    assign rdreq = (state == READING) && sink_ready;
+    
     // State machine and FIFO read request
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             state <= IDLE;
-            rdreq <= 1'b0;
             word_counter <= 10'b0;
             wait_counter <= 4'd0;
-            sink_valid <= 1'b0;
-            sink_sop <= 1'b0;
-            sink_eop <= 1'b0;
 
         end else begin
-            // Default to not requesting data and flags low
-            rdreq <= 1'b0;
-            sink_valid <= 1'b0;
-            sink_sop <= 1'b0;
-            sink_eop <= 1'b0;
-
             if (state == IDLE) begin
                 word_counter <= 10'd0;
 
@@ -59,24 +61,15 @@ module fft_controller (
                     state <= READING;
 
             end else if (state == READING) begin
-                // Latch the show-ahead data and flags regardless of sink_ready
-                sink_valid <= 1'b1;
-                sink_sop <= (word_counter == 10'd0);
-                
-                // Trigger EOP on count 1022 so it appears at output on count 1023
-                sink_eop <= (word_counter == 10'd1022);
-
                 // Only advance the FIFO if the FFT accepts the word
                 if (sink_ready) begin
-                    rdreq <= 1'b1;
-
                     if (word_counter < 10'd1023) begin
                         word_counter <= word_counter + 10'd1;
                     end else begin
-                        // Kill sink_valid immediately for the next cycle to prevent a 1025th word
-                        sink_valid <= 1'b0; 
+                        // Packet finished, go to wait state
                         state <= WAIT_SYNC;
                         wait_counter <= 4'd0;
+                        word_counter <= 10'd0;
                     end
                 end
             
@@ -86,7 +79,9 @@ module fft_controller (
                     wait_counter <= wait_counter + 4'd1;
                 else
                     state <= IDLE;
-            end
+
+            end else
+                state <= IDLE;
 
         end
     end
