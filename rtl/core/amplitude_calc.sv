@@ -49,6 +49,60 @@ module amplitude_calc (
     logic [5:0] exp_delay_2;
     logic [5:0] exp_delay_3;
 
+    logic [31:0] val_32;
+    logic [15:0] val_16;
+    logic [7:0] val_8;
+    logic [3:0] val_4;
+    logic [1:0] val_2;
+
+    logic [4:0] log_index;
+
+    always_comb begin
+        val_32 = {1'b0, raw_amplitude}; // Pad to 32 bits
+
+        // Find the 16s place
+        if (| val_32[31:16]) begin
+            log_index[4] = 1'b1;
+            val_16 = val_32[31:16]; // The 1 is in the top half, so keep the top half
+        end else begin
+            log_index[4] = 1'b0;
+            val_16 = val_32[15:0];  // The 1 is in the bottom half, so keep the bottom half
+        end
+
+        // Find the 8s place
+        if (| val_16[15:8]) begin
+            log_index[3] = 1'b1;
+            val_8 = val_16[15:8];
+        end else begin
+            log_index[3] = 1'b0;
+            val_8 = val_16[7:0];
+        end
+
+        // Find the 4s place
+        if (| val_8[7:4]) begin
+            log_index[2] = 1'b1;
+            val_4 = val_8[7:4];
+        end else begin
+            log_index[2] = 1'b0;
+            val_4 = val_8[3:0];
+        end
+
+        // Find the 2s place
+        if (| val_4[3:2]) begin
+            log_index[1] = 1'b1;
+            val_2 = val_4[3:2];
+        end else begin
+            log_index[1] = 1'b0;
+            val_2 = val_4[1:0];
+        end
+
+        // Find the 1s place
+        if (val_2[1])
+            log_index[0] = 1'b1;
+        else
+            log_index[0] = 1'b0;
+    end
+
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             amplitude <= 16'b0;
@@ -137,60 +191,6 @@ module amplitude_calc (
 
             amplitude <= {11'b0, log_index};
         end
-    end
-
-    logic [31:0] val_32;
-    logic [15:0] val_16;
-    logic [7:0] val_8;
-    logic [3:0] val_4;
-    logic [1:0] val_2;
-
-    logic [4:0] log_index;
-
-    always_comb begin
-        val_32 = {1'b0, raw_amplitude}; // Pad to 32 bits
-
-        // Find the 16s place
-        if (| val_32[31:16]) begin
-            log_index[4] = 1'b1;
-            val_16 = val_32[31:16]; // The 1 is in the top half, so keep the top half
-        end else begin
-            log_index[4] = 1'b0;
-            val_16 = val_32[15:0];  // The 1 is in the bottom half, so keep the bottom half
-        end
-
-        // Find the 8s place
-        if (| val_16[15:8]) begin
-            log_index[3] = 1'b1;
-            val_8 = val_16[15:8];
-        end else begin
-            log_index[3] = 1'b0;
-            val_8 = val_16[7:0];
-        end
-
-        // Find the 4s place
-        if (| val_8[7:4]) begin
-            log_index[2] = 1'b1;
-            val_4 = val_8[7:4];
-        end else begin
-            log_index[2] = 1'b0;
-            val_4 = val_8[3:0];
-        end
-
-        // Find the 2s place
-        if (| val_4[3:2]) begin
-            log_index[1] = 1'b1;
-            val_2 = val_4[3:2];
-        end else begin
-            log_index[1] = 1'b0;
-            val_2 = val_4[1:0];
-        end
-
-        // Find the 1s place
-        if (val_2[1])
-            log_index[0] = 1'b1;
-        else
-            log_index[0] = 1'b0;
     end
 
 endmodule
