@@ -22,7 +22,7 @@ module amplitude_calc (
     logic [15:0] min_val;                   // The minimum value between abs_real and abs_imag
 
     logic [30:0] base_amplitude;            // The amplitude before exponent scaling is applied
-    logic [30:0] raw_amplitude;             // The exponent-scaled amplitude before logarithmic scaling
+    logic [39:0] raw_amplitude;             // The exponent-scaled amplitude before logarithmic scaling
 
     logic [5:0] delayed_exp;                // The delayed exponent of the block-floating-point representation of source
 
