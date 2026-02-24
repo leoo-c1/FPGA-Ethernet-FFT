@@ -1,4 +1,7 @@
 #include <iostream>
+#include <vector>
+#include <thread>
+#include <chrono>
 #include "WavParser.h"
 #include "EthSender.h"
 
@@ -26,12 +29,24 @@ int main() {
     std::cout << "Starting ethernet sender..." << std::endl;
     EthSender sender(fpga_ip, fpga_port);
 
-    // Send the data to the FPGA
-    if (sender.sendData(audio_track, file_sample_rate)) {
-        std::cout << "Audio data has been sent to the FPGA" << std::endl;
-    } else {
-        std::cout << "Error: Failed to send audio data to the FPGA" << std::endl;
-        return 1;
+    // Send data in aligned frames of 1024 samples
+    const size_t FRAME_SIZE = 1024;
+    size_t total_samples = audio_track.size();
+
+    // Step through the file 1024 samples at a time
+    for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
+        
+        // Extract the current frame
+        std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
+
+        // Send the frame (EthSender will split this into two safe packets)
+        if (!sender.sendFrame(frame)) {
+            std::cerr << "Failed to send frame at index " << i << std::endl;
+            break;
+        }
+
+        // Delay to match audio rate (approx 23ms for 1024 samples @ 44.1kHz)
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
     return 0;

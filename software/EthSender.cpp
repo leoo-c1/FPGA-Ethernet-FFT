@@ -47,45 +47,35 @@ EthSender::~EthSender() {
     WSACleanup();
 }
 
-bool EthSender::sendData(const std::vector<int16_t>& data, uint32_t sample_rate) {
+bool EthSender::sendFrame(const std::vector<int16_t>& frame_data) {
     // If socket isn't ready, return false
     if (!is_initialised) {
         std::cout << "Failed, socket not initialised" << std::endl;
         return false;
     }
 
-    int total_samples = data.size();
-    int samples_sent = 0;
-    const int MAX_SAMPLES_PER_PACKET = 736;
-    bool success = true;
-
-    // Loop until all samples are sent
-    while (samples_sent < total_samples) {
-        // Calculate number of samples to send
-        int samples_to_send = std::min(MAX_SAMPLES_PER_PACKET, total_samples - samples_sent);
-        int bytes_to_send = samples_to_send * sizeof(int16_t);
-
-        // Get memory address of current sample chunk
-        const char* buffer_ptr = reinterpret_cast<const char*>(data.data() + samples_sent);
-
-        int send_result = sendto(data_socket, buffer_ptr, bytes_to_send, 0, (sockaddr*)&server_addr, sizeof(server_addr));
-
-        if (send_result == SOCKET_ERROR) {
-            std::cout << "Send failed, error code: " << WSAGetLastError() << std::endl;
-            success = false;
-            break;
-        }
-
-        else {
-            // std::cout << "Sent " << send_result << " bytes" << std::endl;
-            // Update sent samples count
-            samples_sent += samples_to_send;
-
-            // Add delay for the length that the byte chunk plays for
-            unsigned long long delay_us = (samples_to_send * 1000000LL) / sample_rate;
-            std::this_thread::sleep_for(std::chrono::microseconds(delay_us));
-        }
+    // If frame size isn't 1024 samples, return false
+    if (frame_data.size() != 1024) {
+        std::cerr << "Error: Frame size must be 1024 samples." << std::endl;
+        return false;
     }
 
-    return success;
+    // Send packet 1 (samples 0-511, 1024 bytes)
+    int packet_size_bytes = 512 * sizeof(int16_t);
+    const char* ptr1 = reinterpret_cast<const char*>(frame_data.data());
+    
+    int sent1 = sendto(data_socket, ptr1, packet_size_bytes, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    if (sent1 == SOCKET_ERROR) {
+        return false;
+    }
+
+    // Send packet 2 (samples 512-1023, 1024 bytes)
+    const char* ptr2 = reinterpret_cast<const char*>(frame_data.data() + 512);
+    
+    int sent2 = sendto(data_socket, ptr2, packet_size_bytes, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    if (sent2 == SOCKET_ERROR) {
+        return false;
+    }
+
+    return true;
 }
