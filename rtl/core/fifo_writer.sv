@@ -20,7 +20,7 @@ module fifo_writer (
     logic [7:0] data_storage;           // Temporarily hold payload data
     logic chunk_count;                  // Counts how many 8-bit payload chunks we have received
 
-    always_ff @ (posedge phy_clk or negedge resetn) begin
+    always_ff @ (posedge board_clk or negedge resetn) begin
         // On startup or if the reset button is pressed
         if (!resetn) begin
             data_storage <= 8'b0;
