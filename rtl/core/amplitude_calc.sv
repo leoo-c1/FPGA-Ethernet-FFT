@@ -31,18 +31,21 @@ module amplitude_calc (
     logic valid_delay_2;
     logic valid_delay_3;
     logic valid_delay_4;
+    logic valid_delay_5;
 
     // Delay registers for source_sop signal
     logic sop_delay_1;
     logic sop_delay_2;
     logic sop_delay_3;
     logic sop_delay_4;
+    logic sop_delay_5;
 
     // Delay registers for source_eop signal
     logic eop_delay_1;
     logic eop_delay_2;
     logic eop_delay_3;
     logic eop_delay_4;
+    logic eop_delay_5;
 
     // Delay registers for source_exp value
     logic [5:0] exp_delay_1;
@@ -115,38 +118,44 @@ module amplitude_calc (
             valid_delay_2 <= 1'b0;
             valid_delay_3 <= 1'b0;
             valid_delay_4 <= 1'b0;
+            valid_delay_5 <= 1'b0;
             sop_delay_1 <= 1'b0;
             sop_delay_2 <= 1'b0;
             sop_delay_3 <= 1'b0;
             sop_delay_4 <= 1'b0;
+            sop_delay_5 <= 1'b0;
             eop_delay_1 <= 1'b0;
             eop_delay_2 <= 1'b0;
             eop_delay_3 <= 1'b0;
             eop_delay_4 <= 1'b0;
+            eop_delay_5 <= 1'b0;
             exp_delay_1 <= 1'b0;
             exp_delay_2 <= 1'b0;
             exp_delay_3 <= 1'b0;
         end else begin
-            // Shift register (5 clock cycles) for amp_valid signal
+            // Shift register (6 clock cycles) for amp_valid signal
             valid_delay_1 <= source_valid;
             valid_delay_2 <= valid_delay_1;
             valid_delay_3 <= valid_delay_2;
             valid_delay_4 <= valid_delay_3;
-            amp_valid <= valid_delay_4;
+            valid_delay_5 <= valid_delay_4;
+            amp_valid <= valid_delay_5;
 
-            // Shift register (5 clock cycles) for amp_sop signal
+            // Shift register (6 clock cycles) for amp_sop signal
             sop_delay_1 <= source_sop;
             sop_delay_2 <= sop_delay_1;
             sop_delay_3 <= sop_delay_2;
             sop_delay_4 <= sop_delay_3;
-            amp_sop <= sop_delay_4;
+            sop_delay_5 <= sop_delay_4;
+            amp_sop <= sop_delay_5;
 
-            // Shift register (5 clock cycles) for amp_eop signal
+            // Shift register (6 clock cycles) for amp_eop signal
             eop_delay_1 <= source_eop;
             eop_delay_2 <= eop_delay_1;
             eop_delay_3 <= eop_delay_2;
             eop_delay_4 <= eop_delay_3;
-            amp_eop <= eop_delay_4;
+            eop_delay_5 <= eop_delay_4;
+            amp_eop <= eop_delay_5;
 
             // Shift register (4 clock cycles) for delayed_exp signal
             exp_delay_1 <= source_exp;
