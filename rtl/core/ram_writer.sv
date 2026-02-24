@@ -18,16 +18,16 @@ module ram_writer (
             wraddress <= 10'd0;
             wren <= 1'b0;
         end else begin
-            // Default to write enable being low
-            wren <= 1'b0;
+            // wren follows amp_valid on the next clock edge
+            wren <= amp_valid;
+
             // Check if amplitude data is available
             if (amp_valid) begin
-                wren <= 1'b1;
                 data <= amplitude;
+                
                 // If this is the first amplitude we receive, go back to the first address in RAM
                 if (amp_sop)
                     wraddress <= 10'b0;
-
                 else 
                     wraddress <= wraddress + 10'd1;     // Increment our write address for every received amplitude
             end
