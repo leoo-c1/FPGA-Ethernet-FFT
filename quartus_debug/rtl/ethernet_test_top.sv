@@ -44,12 +44,22 @@ module ethernet_test_top #(
         end
     end
 
+    // Phase shift pll
+    logic phy_clk_shifted;
+    logic pll_locked;
+
+    rmii_pll u_phase_shifter (
+        .inclk0(phy_clk),
+        .c0(phy_clk_shifted),
+        .locked(pll_locked)
+    );
+
     ethernet_handler #(
         .FPGA_MAC(FPGA_MAC),
         .FPGA_IP(FPGA_IP),
         .FPGA_PORT(FPGA_PORT)
     ) u_test_handler (
-        .phy_clk(phy_clk),
+        .phy_clk(phy_clk_shifted),
         .board_clk(board_clk),
         .resetn(resetn),
         .data_valid(data_valid),
