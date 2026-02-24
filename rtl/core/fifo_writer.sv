@@ -4,7 +4,7 @@ It then notifies the fifo that the fifo is ready to read these 16 bits.
 */
 
 module fifo_writer (
-    input logic phy_clk,                // 50MHz LAN8720 clock
+    input logic board_clk,              // 50MHz FPGA onboard clock
     input logic resetn,                 // Active low reset button
 
     input logic [7:0] payload,          // The payload data
