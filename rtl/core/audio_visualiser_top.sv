@@ -79,6 +79,7 @@ module audio_visualiser_top #(
         .FPGA_PORT(FPGA_PORT)
     ) u_ethernet_handler (
         .phy_clk(phy_clk),
+        .board_clk(board_clk),
         .resetn(resetn),
         .data_valid(data_valid),
         .rx0(rx0),
