@@ -62,15 +62,19 @@ module fft_controller (
                 // Latch the show-ahead data and flags regardless of sink_ready
                 sink_valid <= 1'b1;
                 sink_sop <= (word_counter == 10'd0);
-                sink_eop <= (word_counter == 10'd1023);
+                
+                // Trigger EOP on count 1022 so it appears at output on count 1023
+                sink_eop <= (word_counter == 10'd1022);
 
                 // Only advance the FIFO if the FFT accepts the word
                 if (sink_ready) begin
                     rdreq <= 1'b1;
 
-                    if (word_counter < 10'd1023)
+                    if (word_counter < 10'd1023) begin
                         word_counter <= word_counter + 10'd1;
-                    else begin
+                    end else begin
+                        // Kill sink_valid immediately for the next cycle to prevent a 1025th word
+                        sink_valid <= 1'b0; 
                         state <= WAIT_SYNC;
                         wait_counter <= 4'd0;
                     end
