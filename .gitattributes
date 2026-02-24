@@ -2,3 +2,6 @@
 fft/** linguist-generated=true
 fifo/** linguist-generated=true
 *.vhd linguist-generated=true
+
+# Ignore the questa files in language statistics
+tb/sim/** linguist-generated=true
