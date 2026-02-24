@@ -20,6 +20,34 @@ module ethernet_handler #(
     output logic payload_last           // Pulses on the last byte of our payload data
     );
 
+    // Delay buffers for sync time
+    logic dv_sync1;
+    logic dv_sync2;
+    logic rx0_sync1;
+    logic rx0_sync2;
+    logic rx1_sync1;
+    logic rx1_sync2;
+
+    always_ff @(posedge phy_clk or negedge resetn) begin
+        if (!resetn) begin
+            dv_sync1 <= 1'b0;
+            dv_sync2  <= 1'b0;
+            rx0_sync1 <= 1'b0;
+            rx0_sync2 <= 1'b0;
+            rx1_sync1 <= 1'b0;
+            rx1_sync2 <= 1'b0;
+        end else begin
+            dv_sync1 <= data_valid;
+            dv_sync2 <= dv_sync1;
+            
+            rx0_sync1 <= rx0;
+            rx0_sync2 <= rx0_sync1;
+            
+            rx1_sync1 <= rx1;
+            rx1_sync2 <= rx1_sync1;
+        end
+    end
+
     logic [7:0] received_byte;          // The 8-bit data made by combining both data pins' inputs
     logic byte_valid;                   // Pulses for one clock cycle on valid byte
 
@@ -28,9 +56,9 @@ module ethernet_handler #(
     rmii_handler byte_receiver (
         .phy_clk(phy_clk),
         .resetn(resetn),
-        .data_valid(data_valid),
-        .rx0(rx0),
-        .rx1(rx1),
+        .data_valid(dv_sync2),
+        .rx0(rx0_sync2),
+        .rx1(rx1_sync2),
         .received_byte(received_byte),
         .byte_valid(byte_valid)
     );
@@ -42,7 +70,7 @@ module ethernet_handler #(
     ) ethernet_parser (
         .phy_clk(phy_clk),
         .resetn(resetn),
-        .data_valid(data_valid),
+        .data_valid(dv_sync2),
         .received_byte(received_byte),
         .byte_valid(byte_valid),
         .payload(payload),
