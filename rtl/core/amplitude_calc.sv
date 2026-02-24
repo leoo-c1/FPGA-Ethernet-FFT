@@ -52,16 +52,26 @@ module amplitude_calc (
     logic [5:0] exp_delay_2;
     logic [5:0] exp_delay_3;
 
+    logic [63:0] val_64;
     logic [31:0] val_32;
     logic [15:0] val_16;
     logic [7:0] val_8;
     logic [3:0] val_4;
     logic [1:0] val_2;
 
-    logic [4:0] log_index;
+    logic [5:0] log_index;
 
     always_comb begin
-        val_32 = {1'b0, raw_amplitude}; // Pad to 32 bits
+        val_64 = {24'b0, raw_amplitude};    // Pad to 64
+
+        // Find the 32s place
+        if (| val_64[63:32]) begin
+            log_index[5] = 1'b1;
+            val_32 = val_64[63:32];
+        end else begin
+            log_index[5] = 1'b0;
+            val_32 = val_64[31:0];
+        end
 
         // Find the 16s place
         if (| val_32[31:16]) begin
@@ -198,7 +208,7 @@ module amplitude_calc (
             else
                 raw_amplitude <= base_amplitude >> delayed_exp;
 
-            amplitude <= {11'b0, log_index};
+            amplitude <= {10'b0, log_index};
         end
     end
 
