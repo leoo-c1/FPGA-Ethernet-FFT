@@ -5,7 +5,7 @@ module eth_parser #(
     parameter FPGA_IP = 32'hC0_00_02_92,        // FPGA's IP address of 192.0.2.146 (theoretical)
     parameter FPGA_PORT = 16'd5005              // FPGA's UDP port (theoretical)
     ) (
-    input logic phy_clk,                // 50MHz LAN8720 clock
+    input logic board_clk,                // 50MHz LAN8720 clock
     input logic resetn,                 // Reset button (active low)
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
@@ -44,7 +44,7 @@ module eth_parser #(
 
     logic [15:0] byte_counter = 0;      // Counts the number of bytes we have received
 
-    always_ff @ (posedge phy_clk or negedge resetn) begin
+    always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             state <= IDLE;
             payload <= 8'b0;
