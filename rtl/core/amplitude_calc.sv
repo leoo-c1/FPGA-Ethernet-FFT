@@ -61,65 +61,6 @@ module amplitude_calc (
     logic [63:0] normalized_val;
     logic [3:0] frac_bits;
 
-    always_comb begin
-        val_64 = {24'b0, raw_amplitude};    // Pad to 64
-
-        // Find the 32s place
-        if (| val_64[63:32]) begin
-            log_index[5] = 1'b1;
-            val_32 = val_64[63:32];
-        end else begin
-            log_index[5] = 1'b0;
-            val_32 = val_64[31:0];
-        end
-
-        // Find the 16s place
-        if (| val_32[31:16]) begin
-            log_index[4] = 1'b1;
-            val_16 = val_32[31:16]; 
-        end else begin
-            log_index[4] = 1'b0;
-            val_16 = val_32[15:0];  
-        end
-
-        // Find the 8s place
-        if (| val_16[15:8]) begin
-            log_index[3] = 1'b1;
-            val_8 = val_16[15:8];
-        end else begin
-            log_index[3] = 1'b0;
-            val_8 = val_16[7:0];
-        end
-
-        // Find the 4s place
-        if (| val_8[7:4]) begin
-            log_index[2] = 1'b1;
-            val_4 = val_8[7:4];
-        end else begin
-            log_index[2] = 1'b0;
-            val_4 = val_8[3:0];
-        end
-
-        // Find the 2s place
-        if (| val_4[3:2]) begin
-            log_index[1] = 1'b1;
-            val_2 = val_4[3:2];
-        end else begin
-            log_index[1] = 1'b0;
-            val_2 = val_4[1:0];
-        end
-
-        // Find the 1s place
-        if (val_2[1])
-            log_index[0] = 1'b1;
-        else
-            log_index[0] = 1'b0;
-
-        // Extract the 4 fractional bits
-        normalized_val = val_64 << (6'd63 - log_index);
-        frac_bits = normalized_val[62:59];
-    end
-
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             amplitude <= 16'b0;
@@ -204,6 +145,63 @@ module amplitude_calc (
                 raw_amplitude <= base_amplitude << (~delayed_exp + 1'b1);
             else
                 raw_amplitude <= base_amplitude >> delayed_exp;
+
+            val_64 = {24'b0, raw_amplitude};    // Pad to 64
+
+            // Find the 32s place
+            if (| val_64[63:32]) begin
+                log_index[5] = 1'b1;
+                val_32 = val_64[63:32];
+            end else begin
+                log_index[5] = 1'b0;
+                val_32 = val_64[31:0];
+            end
+
+            // Find the 16s place
+            if (| val_32[31:16]) begin
+                log_index[4] = 1'b1;
+                val_16 = val_32[31:16]; 
+            end else begin
+                log_index[4] = 1'b0;
+                val_16 = val_32[15:0];  
+            end
+
+            // Find the 8s place
+            if (| val_16[15:8]) begin
+                log_index[3] = 1'b1;
+                val_8 = val_16[15:8];
+            end else begin
+                log_index[3] = 1'b0;
+                val_8 = val_16[7:0];
+            end
+
+            // Find the 4s place
+            if (| val_8[7:4]) begin
+                log_index[2] = 1'b1;
+                val_4 = val_8[7:4];
+            end else begin
+                log_index[2] = 1'b0;
+                val_4 = val_8[3:0];
+            end
+
+            // Find the 2s place
+            if (| val_4[3:2]) begin
+                log_index[1] = 1'b1;
+                val_2 = val_4[3:2];
+            end else begin
+                log_index[1] = 1'b0;
+                val_2 = val_4[1:0];
+            end
+
+            // Find the 1s place
+            if (val_2[1])
+                log_index[0] = 1'b1;
+            else
+                log_index[0] = 1'b0;
+
+            // Extract the 4 fractional bits
+            normalized_val = val_64 << (6'd63 - log_index);
+            frac_bits = normalized_val[62:59];
 
             // Combine integer and fractional parts
             amplitude <= {6'b0, log_index, frac_bits};
