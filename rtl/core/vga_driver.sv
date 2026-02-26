@@ -15,10 +15,8 @@ module vga_driver (
     output logic blue                   // Pixel blue value (single bit, 0v or 0.7v)
     );
 
-    logic [9:0] scaled_amplitude;
-    
-    // If amplitude exceeds 479 (the screen height), hold it at 479
-    assign scaled_amplitude = (q_amplitude > 16'd479) ? 10'd479 : q_amplitude[9:0];
+    logic [8:0] scaled_amplitude;
+    assign scaled_amplitude = q_amplitude[4:0] << 3'd4;
 
     // Delay registers for pixel_y value
     logic [9:0] pixel_y_delay_1;
