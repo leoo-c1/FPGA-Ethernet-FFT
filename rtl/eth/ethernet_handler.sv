@@ -18,7 +18,8 @@ module ethernet_handler #(
 
     output logic [7:0] payload,         // The payload data
     output logic payload_valid,         // Whether we are currently receiving payload data
-    output logic payload_last           // Pulses on the last byte of our payload data
+    output logic payload_last,          // Pulses on the last byte of our payload data
+    output logic byte_valid             // Pulses for one clock cycle on valid byte
     );
 
     // Delay buffers for sync time
@@ -56,7 +57,6 @@ module ethernet_handler #(
     end
 
     logic [7:0] received_byte;          // The 8-bit data made by combining both data pins' inputs
-    logic byte_valid;                   // Pulses for one clock cycle on valid byte
 
     assign tx_en = 1'b0;
 

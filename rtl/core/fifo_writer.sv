@@ -10,6 +10,7 @@ module fifo_writer (
     input logic [7:0] payload,          // The payload data
     input logic payload_valid,          // Whether we are currently receiving payload data
     input logic payload_last,           // Pulses on the last byte of our payload data
+    input logic byte_valid,             // Pulses for one clock cycle on valid byte
 
     input logic wr_full,                // Indicates the fifo is currently full
 
@@ -29,10 +30,10 @@ module fifo_writer (
             fifo_data <= 16'b0;
 
         end else begin
-            // If we are receiving payload data
-            if (payload_valid) begin
-                wrreq <= 1'b0;
+            wrreq <= 1'b0;      // Default to low
 
+            // If we are receiving payload data and a new byte arrived
+            if (payload_valid && byte_valid) begin
                 // Check if this is the first 8 bits of the 16-bit group
                 if (chunk_count == 1'b0) begin
                     data_storage <= payload;    // Store the data
@@ -49,13 +50,10 @@ module fifo_writer (
                         wrreq <= 1'b0;
                 end
 
-            // If we aren't receiving payload data
-            end else
-                wrreq <= 1'b0;
-
             // On the last 8-bit payload chunk, reset the chunk counter
             if (payload_last)
                 chunk_count <= 1'b0;
+            end
         end
     end
 
