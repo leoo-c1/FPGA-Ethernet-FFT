@@ -39,7 +39,7 @@ int main() {
         // Extract the current frame
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
-        // Send the frame (EthSender will split this into two safe packets)
+        // Send the frame
         if (!sender.sendFrame(frame)) {
             std::cerr << "Failed to send frame at index " << i << std::endl;
             break;
@@ -48,6 +48,8 @@ int main() {
         // Delay to match audio rate (approx 23ms for 1024 samples @ 44.1kHz)
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
+
+    std::cout << "Contents of wav file have been sent" << std::endl;
 
     return 0;
 }
