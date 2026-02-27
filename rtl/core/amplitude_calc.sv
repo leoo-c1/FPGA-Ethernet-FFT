@@ -58,6 +58,9 @@ module amplitude_calc (
 
     logic [5:0] log_index;
 
+    logic [63:0] normalized_val;
+    logic [3:0] frac_bits;
+
     always_comb begin
         val_64 = {24'b0, raw_amplitude};    // Pad to 64
 
@@ -73,10 +76,10 @@ module amplitude_calc (
         // Find the 16s place
         if (| val_32[31:16]) begin
             log_index[4] = 1'b1;
-            val_16 = val_32[31:16]; // The 1 is in the top half, so keep the top half
+            val_16 = val_32[31:16]; 
         end else begin
             log_index[4] = 1'b0;
-            val_16 = val_32[15:0];  // The 1 is in the bottom half, so keep the bottom half
+            val_16 = val_32[15:0];  
         end
 
         // Find the 8s place
@@ -111,6 +114,10 @@ module amplitude_calc (
             log_index[0] = 1'b1;
         else
             log_index[0] = 1'b0;
+
+        // Extract the 4 fractional bits
+        normalized_val = val_64 << (6'd63 - log_index);
+        frac_bits = normalized_val[62:59];
     end
 
     always_ff @ (posedge board_clk or negedge resetn) begin
@@ -195,11 +202,11 @@ module amplitude_calc (
             // Decide the direction of bit shift based on sign of the exponent
             if (delayed_exp[5]) 
                 raw_amplitude <= base_amplitude << (~delayed_exp + 1'b1);
-            
             else
                 raw_amplitude <= base_amplitude >> delayed_exp;
 
-            amplitude <= {10'b0, log_index};
+            // Combine integer and fractional parts
+            amplitude <= {6'b0, log_index, frac_bits};
         end
     end
 
