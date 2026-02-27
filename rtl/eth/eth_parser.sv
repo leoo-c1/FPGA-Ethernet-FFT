@@ -192,8 +192,8 @@ module eth_parser #(
                 end
 
             end else if (state == PAYLOAD) begin
+                payload_valid <= 1'b1;
                 if (byte_valid) begin
-                    payload_valid <= 1'b1;
                     payload <= received_byte;
 
                     if (byte_counter < udp_header_content.udp_len - 16'd9) begin
@@ -205,8 +205,7 @@ module eth_parser #(
                         payload_last <= 1'b1;
                         state <= FCS;
                     end
-                end else
-                    payload_valid <= 1'b0;
+                end
 
             end else if (state == FCS) begin
                 if (byte_valid) begin
