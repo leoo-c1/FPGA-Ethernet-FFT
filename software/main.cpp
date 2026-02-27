@@ -2,8 +2,16 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <windows.h>
 #include "WavParser.h"
 #include "EthSender.h"
+
+#pragma comment(lib, "winmm.lib")       // Link the Windows multimedia library
+
+// Function to play audio
+void playAudioFile(const std::string& filepath) {
+    PlaySoundA(filepath.c_str(), NULL, SND_FILENAME | SND_NODEFAULT | SND_SYNC);
+}
 
 int main() {
     std::string wav_file_path = "../audio/example_wav_mono.wav";    // File path for wav audio
@@ -29,6 +37,10 @@ int main() {
     std::cout << "Starting ethernet sender..." << std::endl;
     EthSender sender(fpga_ip, fpga_port);
 
+    // Start playing the audio file on different thread
+    std::cout << "Starting audio playback" << std::endl;
+    std::thread audio_thread(playAudioFile, wav_file_path);
+
     // Send data in aligned frames of 1024 samples
     const size_t FRAME_SIZE = 1024;
     size_t total_samples = audio_track.size();
@@ -40,10 +52,10 @@ int main() {
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
         // Send the same frame 10 times
-        for (int repeat = 0; repeat < 100; repeat++) {
+        for (int repeat = 0; repeat < 200; repeat++) {
             sender.sendFrame(frame);
             // Tiny delay for safety
-            std::this_thread::sleep_for(std::chrono::microseconds(10)); 
+            std::this_thread::sleep_for(std::chrono::microseconds(1)); 
         }
 
         // Delay to match audio rate (approx 23ms for 1024 samples @ 44.1kHz)
@@ -51,6 +63,12 @@ int main() {
     }
     
     std::cout << "Contents of wav file have been sent" << std::endl;
+
+    // Wait for the audio to finish playing before stopping the program
+    if (audio_thread.joinable()) {
+        std::cout << "Waiting for audio playback to finish" << std::endl;
+        audio_thread.join();
+    }
 
     return 0;
 }
