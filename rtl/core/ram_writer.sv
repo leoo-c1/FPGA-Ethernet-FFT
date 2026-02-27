@@ -12,24 +12,50 @@ module ram_writer (
     output logic wren                       // Enables writing to the RAM when high
     );
 
+    logic [8:0] displayed_bins;             // Tracks bins from 0 to 511
+    logic [19:0] sum_acc;                   // 20-bit accumulator to prevent overflow
+
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
             data <= 16'b0;
             wraddress <= 10'd0;
             wren <= 1'b0;
+            displayed_bins <= 9'd0;
+            sum_acc <= 20'd0;
         end else begin
-            // wren follows amp_valid on the next clock edge
-            wren <= amp_valid;
+            wren <= 1'b0;                   // Default to not writing
 
-            // Check if amplitude data is available
             if (amp_valid) begin
-                data <= amplitude;
-                
-                // If this is the first amplitude we receive, go back to the first address in RAM
-                if (amp_sop)
-                    wraddress <= 10'b0;
-                else 
-                    wraddress <= wraddress + 10'd1;     // Increment our write address for every received amplitude
+                if (amp_sop) begin
+                    // On the first bin, start tracking and start the sum
+                    displayed_bins <= 9'd1;
+                    sum_acc <= amplitude;
+                    wraddress <= 10'd0;
+                    
+                end else if (displayed_bins != 9'd0) begin 
+                    if (displayed_bins == 9'd511) begin
+                        displayed_bins <= 9'd0;         // Reached the center, stop tracking
+                    end else begin
+                        displayed_bins <= displayed_bins + 9'd1;
+                    end
+
+                    // Check if this is the last bin of our 16-bin chunk
+                    if (displayed_bins[3:0] == 4'd15) begin
+                        // Add final amplitude and divide by 16
+                        data <= (sum_acc + amplitude) >> 4;
+                        wren <= 1'b1;
+                    end else if (displayed_bins[3:0] == 4'd0) begin
+                        // If it's the start of a new chunk, start a new sum
+                        sum_acc <= amplitude;
+                    end else begin
+                        sum_acc <= sum_acc + amplitude;
+                    end
+                end
+            end
+
+            // Increment the ram address after we trigger a write
+            if (wren) begin
+                wraddress <= wraddress + 10'd1;
             end
         end
     end
