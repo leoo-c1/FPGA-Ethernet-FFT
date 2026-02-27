@@ -67,42 +67,28 @@ int main() {
     const size_t FRAME_SIZE = 1024;
     size_t total_samples = audio_track.size();
 
-    // Calculate the duration of one frame
-    auto frame_duration = std::chrono::microseconds( (FRAME_SIZE * 1000000) / file_sample_rate );
-    
-    // Send packets for a bit less than the frame duration to leave time for processing
-    auto blast_duration = frame_duration - std::chrono::microseconds(1000); 
+    // Record the absolute time the playback started
+    auto playback_start_time = std::chrono::steady_clock::now();
 
     // Step through the file 1024 samples at a time
     for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
         
-        // Record the exact time we start processing this frame
-        auto frame_start_time = std::chrono::steady_clock::now();
-        
         // Extract the current frame
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
+        // Calculate the absolute time this frame should finish
+        auto frame_end_time = playback_start_time + std::chrono::microseconds( ((i + FRAME_SIZE) * 1000000ULL) / file_sample_rate );
+        
+        // Send packets for a bit less than the frame duration to leave time for processing
+        auto blast_end_time = frame_end_time - std::chrono::microseconds(1000);
+
         // Send as many copies as possible within the time limit
-        while (true) {
+        while (std::chrono::steady_clock::now() < blast_end_time) {
             sender.sendFrame(frame);
-            
-            auto time_taken = std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::steady_clock::now() - frame_start_time
-            );
-            
-            // If we reach the time limit, go to the next frame
-            if (time_taken >= blast_duration) {
-                break;
-            }
         }
 
-        // Sleep for the remaining time
-        auto final_time_taken = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::steady_clock::now() - frame_start_time
-        );
-        if (final_time_taken < frame_duration) {
-            std::this_thread::sleep_for(frame_duration - final_time_taken);
-        }
+        // Sleep precisely until the absolute frame boundary
+        std::this_thread::sleep_until(frame_end_time);
     }
     
     std::cout << "Contents of wav file have been sent" << std::endl;
