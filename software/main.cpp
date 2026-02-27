@@ -2,16 +2,12 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include <windows.h>
-#include "WavParser.h"
 #include "EthSender.h"
+#include <windows.h>
+#include <mmsystem.h>
+#include "WavParser.h"
 
 #pragma comment(lib, "winmm.lib")       // Link the Windows multimedia library
-
-// Function to play audio
-void playAudioFile(const std::string& filepath) {
-    PlaySoundA(filepath.c_str(), NULL, SND_FILENAME | SND_NODEFAULT | SND_SYNC);
-}
 
 int main() {
     std::string wav_file_path = "../audio/example_wav_mono.wav";    // File path for wav audio
@@ -34,12 +30,36 @@ int main() {
     std::cout << "Loaded " << audio_track.size() << " total samples into memory" << std::endl;
 
     // Instantiate the Ethernet Sender
-    std::cout << "Starting ethernet sender..." << std::endl;
+    std::cout << "Starting ethernet sender" << std::endl;
     EthSender sender(fpga_ip, fpga_port);
 
-    // Start playing the audio file on different thread
+    // Setup audio buffer
+    WAVEFORMATEX wfx = {0};
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nChannels = 1;
+    wfx.nSamplesPerSec = file_sample_rate;
+    wfx.wBitsPerSample = 16;
+    wfx.nBlockAlign = (wfx.nChannels * wfx.wBitsPerSample) / 8;
+    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+    wfx.cbSize = 0;
+
+    HWAVEOUT hWaveOut;
+    // Open the default audio device
+    if (waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL) != MMSYSERR_NOERROR) {
+        std::cout << "Error: Failed to open system audio device" << std::endl;
+        return 1;
+    }
+
+    // Point the audio header to parsed data
+    WAVEHDR waveHeader = {0};
+    waveHeader.lpData = (LPSTR)audio_track.data();
+    waveHeader.dwBufferLength = audio_track.size() * sizeof(int16_t);
+    
+    // Prepare waveoutWrite
+    waveOutPrepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
+    
     std::cout << "Starting audio playback" << std::endl;
-    std::thread audio_thread(playAudioFile, wav_file_path);
+    waveOutWrite(hWaveOut, &waveHeader, sizeof(WAVEHDR));
 
     // Send data in aligned frames of 1024 samples
     const size_t FRAME_SIZE = 1024;
@@ -51,7 +71,7 @@ int main() {
         // Extract the current frame
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
-        // Send the same frame 10 times
+        // Send the same frame 200 times
         for (int repeat = 0; repeat < 200; repeat++) {
             sender.sendFrame(frame);
             // Tiny delay for safety
@@ -64,11 +84,15 @@ int main() {
     
     std::cout << "Contents of wav file have been sent" << std::endl;
 
-    // Wait for the audio to finish playing before stopping the program
-    if (audio_thread.joinable()) {
-        std::cout << "Waiting for audio playback to finish" << std::endl;
-        audio_thread.join();
+    // Wait for the background audio buffer to finish playing
+    std::cout << "Waiting for audio playback to finish" << std::endl;
+    while (!(waveHeader.dwFlags & WHDR_DONE)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+
+    // Clean up audio resources
+    waveOutUnprepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
+    waveOutClose(hWaveOut);
 
     return 0;
 }
