@@ -69,14 +69,13 @@ module vga_driver (
             if (pixel_x >= 10'd64 && pixel_x < 10'd576) begin
                 // Divide by 16 to stretch each RAM address across 16 pixels
                 rdaddress <= (pixel_x - 10'd64) >> 4;
-            end else begin
+            end else if (pixel_x == 10'd799) begin
+                // On the very last pixel, schedule a read from the first memory address
                 rdaddress <= 10'b0;
             end
 
             if (vid_delay_3) begin
-                // Check if we are inside the active 512-pixel EQ window
                 if (pixel_x_delay_3 >= 10'd64 && pixel_x_delay_3 < 10'd576) begin
-                    // Create a 2-pixel gap between bars (draw if remainder < 14)
                     if (((pixel_x_delay_3 - 10'd64) & 10'd15) < 10'd14) begin
                         // Measure from the bottom of the screen, use delayed pixel_y coordinate
                         if (10'd479 - pixel_y_delay_3 < scaled_amplitude) begin
@@ -91,13 +90,11 @@ module vga_driver (
                             blue <= 1'b0;
                         end
                     end else begin
-                        // Gap between bars
                         red <= 1'b0;
                         green <= 1'b0;
                         blue <= 1'b0;
                     end
                 end else begin
-                    // Margins outside the EQ window
                     red <= 1'b0;
                     green <= 1'b0;
                     blue <= 1'b0;
