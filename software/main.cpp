@@ -10,7 +10,9 @@
 #pragma comment(lib, "winmm.lib")       // Link the Windows multimedia library
 
 int main() {
-    std::string wav_file_path = "../audio/example_wav_mono.wav";    // File path for wav audio
+    timeBeginPeriod(1);
+
+    std::string wav_file_path = "../audio/logarithmic_sweep.wav";    // File path for wav audio
     std::string fpga_ip = "192.0.2.146";                            // FPGA's IP address
     int fpga_port = 5005;                                           // FPGA's UDP port
 
@@ -65,21 +67,42 @@ int main() {
     const size_t FRAME_SIZE = 1024;
     size_t total_samples = audio_track.size();
 
+    // Calculate the duration of one frame
+    auto frame_duration = std::chrono::microseconds( (FRAME_SIZE * 1000000) / file_sample_rate );
+    
+    // Send packets for a bit less than the frame duration to leave time for processing
+    auto blast_duration = frame_duration - std::chrono::microseconds(1000); 
+
     // Step through the file 1024 samples at a time
     for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
+        
+        // Record the exact time we start processing this frame
+        auto frame_start_time = std::chrono::steady_clock::now();
         
         // Extract the current frame
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
-        // Send the same frame 200 times
-        for (int repeat = 0; repeat < 200; repeat++) {
+        // Send as many copies as possible within the time limit
+        while (true) {
             sender.sendFrame(frame);
-            // Tiny delay for safety
-            std::this_thread::sleep_for(std::chrono::microseconds(1)); 
+            
+            auto time_taken = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::steady_clock::now() - frame_start_time
+            );
+            
+            // If we reach the time limit, go to the next frame
+            if (time_taken >= blast_duration) {
+                break;
+            }
         }
 
-        // Delay to match audio rate (approx 23ms for 1024 samples @ 44.1kHz)
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        // Sleep for the remaining time
+        auto final_time_taken = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now() - frame_start_time
+        );
+        if (final_time_taken < frame_duration) {
+            std::this_thread::sleep_for(frame_duration - final_time_taken);
+        }
     }
     
     std::cout << "Contents of wav file have been sent" << std::endl;
@@ -93,6 +116,8 @@ int main() {
     // Clean up audio resources
     waveOutUnprepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
     waveOutClose(hWaveOut);
+
+    timeEndPeriod(1);
 
     return 0;
 }
