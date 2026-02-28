@@ -9,12 +9,17 @@
 
 #pragma comment(lib, "winmm.lib")       // Link the Windows multimedia library
 
-int main() {
-    timeBeginPeriod(1);
+// GUI state variables
+std::string selected_wav_path = "../audio/logarithmic_sweep.wav";   // Still hardcoded for now
+std::string fpga_ip = "192.0.2.146";                                // FPGA's IP address
+int fpga_port = 5005;                                               // FPGA's UDP port
 
-    std::string wav_file_path = "../audio/logarithmic_sweep.wav";    // File path for wav audio
-    std::string fpga_ip = "192.0.2.146";                            // FPGA's IP address
-    int fpga_port = 5005;                                           // FPGA's UDP port
+// GUI Element Handles
+HWND hPathLabel;
+HWND hBtnSelect, hBtnStart, hBtnStop;
+
+void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga_port) {
+    timeBeginPeriod(1);
 
     // Instantiate the parser
     std::cout << "Starting wav parser..." << std::endl;
@@ -23,7 +28,7 @@ int main() {
     // Check if parsing succeeded before continuing
     if (!parser.parse()) {
         std::cout << "Error: Unable to parse wav file" << std::endl;
-        return 1;
+        return;
     }
 
     // Retrieve the parsed audio data and sample rate
@@ -49,7 +54,7 @@ int main() {
     // Open the default audio device
     if (waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL) != MMSYSERR_NOERROR) {
         std::cout << "Error: Failed to open system audio device" << std::endl;
-        return 1;
+        return;
     }
 
     // Point the audio header to parsed data
@@ -104,6 +109,70 @@ int main() {
     waveOutClose(hWaveOut);
 
     timeEndPeriod(1);
+    std::cout << "Ready for next file" << std::endl;
+}
+
+// GUI handler
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+        case WM_COMMAND:
+            if (LOWORD(wParam) == 1) {      // Select File Button
+                // Implement file picker
+            }
+            else if (LOWORD(wParam) == 2) {      // Start Button
+                AudioStreamingTask(selected_wav_path, fpga_ip, fpga_port);
+            }
+            else if (LOWORD(wParam) == 3) {     // Stop Button
+                // Implement stop logic
+            }
+            break;
+
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+int main() {
+    // Register the window class
+    WNDCLASSA wc = {0};
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = GetModuleHandle(NULL);
+    wc.lpszClassName = "FPGAVisClass";
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+
+    RegisterClassA(&wc);
+
+    // Create the window
+    HWND hwnd = CreateWindowExA(
+        0, "FPGAVisClass", "FPGA Audio Visualiser Controller",
+        WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,   // Make window non-resizable
+        CW_USEDEFAULT, CW_USEDEFAULT, 400, 200,
+        NULL, NULL, wc.hInstance, NULL
+    );
+
+    // Create GUI Controls
+    hBtnSelect = CreateWindowA("BUTTON", "Select WAV File", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+                                20, 20, 150, 30, hwnd, (HMENU)1, wc.hInstance, NULL);
+
+    hPathLabel = CreateWindowA("STATIC", "No file selected", WS_VISIBLE | WS_CHILD,
+                                20, 60, 340, 40, hwnd, NULL, wc.hInstance, NULL);
+
+    hBtnStart = CreateWindowA("BUTTON", "START", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                                20, 110, 100, 30, hwnd, (HMENU)2, wc.hInstance, NULL);
+
+    hBtnStop = CreateWindowA("BUTTON", "STOP", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                                140, 110, 100, 30, hwnd, (HMENU)3, wc.hInstance, NULL);
+
+    ShowWindow(hwnd, SW_SHOW);
+
+    // Run the Windows message loop
+    MSG msg = {0};
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
     return 0;
 }
