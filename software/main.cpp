@@ -73,7 +73,7 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     auto playback_start_time = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
-        if (stop_requested) break;
+        if (stop_requested) break;          // Exit loop immediately if STOP is clicked
 
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
@@ -81,17 +81,24 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
         auto blast_end_time = frame_end_time - std::chrono::microseconds(1000);
 
         while (std::chrono::steady_clock::now() < blast_end_time) {
+            if (stop_requested) break;
             sender.sendFrame(frame);
         }
 
+        if (stop_requested) break;
         std::this_thread::sleep_until(frame_end_time);
     }
     
     std::cout << "Stream ended" << std::endl;
 
-    std::cout << "Waiting for audio playback to finish" << std::endl;
-    while (!(waveHeader.dwFlags & WHDR_DONE)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (stop_requested) {
+        waveOutReset(hWaveOut);     // Instantly stop the audio buffer
+    } else {
+        std::cout << "Waiting for audio playback to finish" << std::endl;
+        while (!(waveHeader.dwFlags & WHDR_DONE)) {
+            if (stop_requested) { waveOutReset(hWaveOut); break; }
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
     }
 
     waveOutUnprepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
@@ -99,7 +106,6 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     timeEndPeriod(1);
 
     is_playing = false;
-    stop_requested = false;
     std::cout << "Ready for next file" << std::endl;
 }
 
@@ -126,7 +132,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             }
             else if (LOWORD(wParam) == 2) {      // Start Button
                 if (!is_playing && !selected_wav_path.empty()) {
-                    stop_requested = false;
                     // Detach thread to run in background without blocking GUI
                     std::thread(AudioStreamingTask, selected_wav_path, "192.0.2.146", 5005).detach();
                 } else if (selected_wav_path.empty()) {
@@ -141,7 +146,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             break;
 
         case WM_DESTROY:
-            stop_requested = true;
+            stop_requested = true;              // Ensure thread dies if window is closed
             PostQuitMessage(0);
             return 0;
     }
