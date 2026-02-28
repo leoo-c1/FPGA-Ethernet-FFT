@@ -12,8 +12,17 @@ module ram_writer (
     output logic wren                       // Enables writing to the RAM when high
     );
 
+    // Lookup table for highest FFT bin included in that bar
+    logic [8:0] log_boundaries [0:31] = '{
+        9'd1,   9'd2,   9'd3,   9'd4,   9'd5,   9'd6,   9'd8,   9'd10,
+        9'd12,  9'd15,  9'd18,  9'd22,  9'd27,  9'd32,  9'd38,  9'd45,
+        9'd53,  9'd63,  9'd75,  9'd89,  9'd106, 9'd126, 9'd150, 9'd178,
+        9'd211, 9'd251, 9'd298, 9'd354, 9'd421, 9'd500, 9'd510, 9'd511
+    };
+
     logic [8:0] displayed_bins;             // Tracks bins from 0 to 511
-    logic [19:0] sum_acc;                   // 20-bit accumulator to prevent overflow
+    logic [4:0] current_bar;                // Tracks which of the 32 bars we are currently filling
+    logic [15:0] max_amp;                   // Stores the highest amplitude found in the current band
 
     always_ff @ (posedge board_clk or negedge resetn) begin
         if (!resetn) begin
@@ -21,34 +30,41 @@ module ram_writer (
             wraddress <= 10'd0;
             wren <= 1'b0;
             displayed_bins <= 9'd0;
-            sum_acc <= 20'd0;
+            current_bar <= 5'd0;
+            max_amp <= 16'd0;
         end else begin
             wren <= 1'b0;                   // Default to not writing
 
             if (amp_valid) begin
                 if (amp_sop) begin
-                    // On the first bin, start tracking and start the sum
-                    displayed_bins <= 9'd1;
-                    sum_acc <= amplitude;
+                    // On the first bin, reset trackers and set the first max_amp
+                    displayed_bins <= 9'd0;
+                    current_bar <= 5'd0;
+                    max_amp <= amplitude;
                     wraddress <= 10'd0;
                     
-                end else if (displayed_bins != 9'd0) begin 
-                    if (displayed_bins == 9'd511) begin
-                        displayed_bins <= 9'd0;         // Reached the center, stop tracking
-                    end else begin
-                        displayed_bins <= displayed_bins + 9'd1;
-                    end
+                end else if (displayed_bins < 9'd511) begin 
+                    // Increment the bin counter
+                    displayed_bins <= displayed_bins + 9'd1;
 
-                    // Check if this is the last bin of our 16-bin chunk
-                    if (displayed_bins[3:0] == 4'd15) begin
-                        // Add final amplitude and divide by 16
-                        data <= (sum_acc + amplitude) >> 4;
-                        wren <= 1'b1;
-                    end else if (displayed_bins[3:0] == 4'd0) begin
-                        // If it's the start of a new chunk, start a new sum
-                        sum_acc <= amplitude;
+                    // Check if we just hit the boundary for the current bar
+                    if ((displayed_bins + 9'd1) == log_boundaries[current_bar]) begin
+                        // Compare the final bin of the boundary against the max
+                        if (amplitude > max_amp) begin
+                            data <= amplitude;
+                        end else begin
+                            data <= max_amp;
+                        end
+                        
+                        wren <= 1'b1;                       // Write to the RAM
+                        current_bar <= current_bar + 5'd1;  // Move to the next bar
+                        max_amp <= 16'd0;                   // Reset max_amp for the next bar
+                        
                     end else begin
-                        sum_acc <= sum_acc + amplitude;
+                        // While still inside the current bar's frequency range, keep the highest peak
+                        if (amplitude > max_amp) begin
+                            max_amp <= amplitude;
+                        end
                     end
                 end
             end
