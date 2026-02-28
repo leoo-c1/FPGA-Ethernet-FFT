@@ -106,6 +106,7 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     timeEndPeriod(1);
 
     is_playing = false;
+    stop_requested = false;
     std::cout << "Ready for next file" << std::endl;
 }
 
@@ -132,6 +133,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             }
             else if (LOWORD(wParam) == 2) {      // Start Button
                 if (!is_playing && !selected_wav_path.empty()) {
+                    stop_requested = false;
                     // Detach thread to run in background without blocking GUI
                     std::thread(AudioStreamingTask, selected_wav_path, "192.0.2.146", 5005).detach();
                 } else if (selected_wav_path.empty()) {
