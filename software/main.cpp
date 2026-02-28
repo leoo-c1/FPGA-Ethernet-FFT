@@ -2,45 +2,46 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <atomic>
 #include "EthSender.h"
 #include <windows.h>
 #include <mmsystem.h>
 #include "WavParser.h"
 
-#pragma comment(lib, "winmm.lib")       // Link the Windows multimedia library
+#pragma comment(lib, "winmm.lib")       
+#pragma comment(lib, "comdlg32.lib")
 
 // GUI state variables
-std::string selected_wav_path = "../audio/logarithmic_sweep.wav";   // Still hardcoded for now
-std::string fpga_ip = "192.0.2.146";                                // FPGA's IP address
-int fpga_port = 5005;                                               // FPGA's UDP port
+std::string selected_wav_path = "";
+std::atomic<bool> is_playing(false);
+std::atomic<bool> stop_requested(false);
 
-// GUI Element Handles
+// GUI element handlers
 HWND hPathLabel;
 HWND hBtnSelect, hBtnStart, hBtnStop;
 
+// Background audio and network thread
 void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga_port) {
+    is_playing = true;
     timeBeginPeriod(1);
 
-    // Instantiate the parser
     std::cout << "Starting wav parser..." << std::endl;
     WavParser parser(wav_file_path);
     
-    // Check if parsing succeeded before continuing
     if (!parser.parse()) {
         std::cout << "Error: Unable to parse wav file" << std::endl;
+        is_playing = false;
+        timeEndPeriod(1);
         return;
     }
 
-    // Retrieve the parsed audio data and sample rate
     const std::vector<int16_t>& audio_track = parser.getAudioData();
     uint32_t file_sample_rate = parser.getSampleRate();
     std::cout << "Loaded " << audio_track.size() << " total samples into memory" << std::endl;
 
-    // Instantiate the Ethernet Sender
     std::cout << "Starting ethernet sender" << std::endl;
     EthSender sender(fpga_ip, fpga_port);
 
-    // Setup audio buffer
     WAVEFORMATEX wfx = {0};
     wfx.wFormatTag = WAVE_FORMAT_PCM;
     wfx.nChannels = 1;
@@ -51,64 +52,54 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     wfx.cbSize = 0;
 
     HWAVEOUT hWaveOut;
-    // Open the default audio device
     if (waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL) != MMSYSERR_NOERROR) {
         std::cout << "Error: Failed to open system audio device" << std::endl;
+        is_playing = false;
+        timeEndPeriod(1);
         return;
     }
 
-    // Point the audio header to parsed data
     WAVEHDR waveHeader = {0};
     waveHeader.lpData = (LPSTR)audio_track.data();
     waveHeader.dwBufferLength = audio_track.size() * sizeof(int16_t);
     
-    // Prepare waveoutWrite
     waveOutPrepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
     
     std::cout << "Starting audio playback" << std::endl;
     waveOutWrite(hWaveOut, &waveHeader, sizeof(WAVEHDR));
 
-    // Send data in aligned frames of 1024 samples
     const size_t FRAME_SIZE = 1024;
     size_t total_samples = audio_track.size();
-
-    // Record the absolute time the playback started
     auto playback_start_time = std::chrono::steady_clock::now();
 
-    // Step through the file 1024 samples at a time
     for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
-        
-        // Extract the current frame
+        if (stop_requested) break;
+
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
-        // Calculate the absolute time this frame should finish
         auto frame_end_time = playback_start_time + std::chrono::microseconds( ((i + FRAME_SIZE) * 1000000ULL) / file_sample_rate );
-        
-        // Send packets for a bit less than the frame duration to leave time for processing
         auto blast_end_time = frame_end_time - std::chrono::microseconds(1000);
 
-        // Send as many copies as possible within the time limit
         while (std::chrono::steady_clock::now() < blast_end_time) {
             sender.sendFrame(frame);
         }
 
-        // Sleep precisely until the absolute frame boundary
         std::this_thread::sleep_until(frame_end_time);
     }
     
-    std::cout << "Contents of wav file have been sent" << std::endl;
+    std::cout << "Stream ended" << std::endl;
 
-    // Wait for the background audio buffer to finish playing
     std::cout << "Waiting for audio playback to finish" << std::endl;
     while (!(waveHeader.dwFlags & WHDR_DONE)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    // Clean up audio resources
     waveOutUnprepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
     waveOutClose(hWaveOut);
-
     timeEndPeriod(1);
+
+    is_playing = false;
+    stop_requested = false;
     std::cout << "Ready for next file" << std::endl;
 }
 
@@ -117,17 +108,40 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     switch (uMsg) {
         case WM_COMMAND:
             if (LOWORD(wParam) == 1) {      // Select File Button
-                // Implement file picker
+                OPENFILENAMEA ofn;
+                char szFile[260] = {0};
+                ZeroMemory(&ofn, sizeof(ofn));
+                ofn.lStructSize = sizeof(ofn);
+                ofn.hwndOwner = hwnd;
+                ofn.lpstrFile = szFile;
+                ofn.nMaxFile = sizeof(szFile);
+                ofn.lpstrFilter = "WAV Files\0*.wav\0All Files\0*.*\0";
+                ofn.nFilterIndex = 1;
+                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+                if (GetOpenFileNameA(&ofn)) {
+                    selected_wav_path = ofn.lpstrFile;
+                    SetWindowTextA(hPathLabel, selected_wav_path.c_str());
+                }
             }
             else if (LOWORD(wParam) == 2) {      // Start Button
-                AudioStreamingTask(selected_wav_path, fpga_ip, fpga_port);
+                if (!is_playing && !selected_wav_path.empty()) {
+                    stop_requested = false;
+                    // Detach thread to run in background without blocking GUI
+                    std::thread(AudioStreamingTask, selected_wav_path, "192.0.2.146", 5005).detach();
+                } else if (selected_wav_path.empty()) {
+                    MessageBoxA(hwnd, "Please select a WAV file first", "Error", MB_ICONWARNING);
+                }
             }
             else if (LOWORD(wParam) == 3) {     // Stop Button
-                // Implement stop logic
+                if (is_playing) {
+                    stop_requested = true;
+                }
             }
             break;
 
         case WM_DESTROY:
+            stop_requested = true;
             PostQuitMessage(0);
             return 0;
     }
