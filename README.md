@@ -37,7 +37,7 @@ graph LR
 ## Features
 
 * Custom SystemVerilog Ethernet parser that decodes physical RMII signals, extracts IPv4/UDP payloads, and drops invalid packets using real-time checksum verification.
-* C++ driver that completely bypasses OS timing drift, maintaining perfect microsecond synchronization with the audio track.
+* C++ driver that bypasses OS timing drift, maintaining perfect synchronization with the audio track.
 * An exponential mathematical Look-Up Table (LUT) that maps the 512 linear FFT bins to 32 visual bands based on human octave perception: $b(x) = B_{min} \cdot (B_{max}/B_{min})^{x/(N-1)}$.
 * A custom max-pooling circuit that tracks the highest peak, ensuring sharp percussion like hi-hats still make the visualiser react violently.
 
@@ -78,6 +78,7 @@ netsh interface ip add neighbors "Ethernet Interface Name" 192.0.2.146 00-1A-2B-
 ```
 
 ├── quartus/               # Quartus Prime project files and QSF constraints
+├── audio/                 # Example .wav files to use with the visualiser
 ├── rtl/
 │   ├── core/              # Project-specific logic (Top level, memory writers, VGA driver)
 │   ├── eth/               # Custom RMII Ethernet MAC and UDP Parser
@@ -85,5 +86,6 @@ netsh interface ip add neighbors "Ethernet Interface Name" 192.0.2.146 00-1A-2B-
 │   ├── fifo/              # Dual-Clock FIFO IP
 │   ├── ram/               # Dual-Port RAM IP
 │   └── vga/               # VGA sync generators and 25.175MHz PLL
+├── tb/                    # Questa testbenches and Signal Tap setup files
 └── software/
     └── main.cpp           # C++ Transmitter GUI
