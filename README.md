@@ -41,7 +41,7 @@ graph LR
 * An exponential mathematical Look-Up Table (LUT) that maps the 512 linear FFT bins to 32 visual bands based on human octave perception: $b(x) = B_{min} \cdot (B_{max}/B_{min})^{x/(N-1)}$.
 * A custom max-pooling circuit that tracks the highest peak, ensuring sharp percussion like hi-hats still make the visualiser react violently.
 
-* ## Hardware Implementation
+## Hardware Implementation
 
 The project runs on the Intel Cyclone IV EP4CE6E22C8N FPGA using the RZ-EasyFPGA A2.2 development board. The physical layer interface is provided by a generic LAN8720 Module. A USB-C to Ethernet adapter is used to create a dedicated local network link between the host PC and the FPGA. Output is sent to a monitor via a standard VGA-to-HDMI adapter.
 
