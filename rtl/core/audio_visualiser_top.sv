@@ -28,6 +28,7 @@ module audio_visualiser_top #(
     logic payload_valid;                // Whether we are currently receiving payload data
     logic payload_last;                 // Pulses on the last byte of our payload data
     logic byte_valid;                   // Pulses for one clock cycle on valid byte
+    logic payload_flush;                // Tells the FIFO to drop the half-filled frame
 
     // u_fifo_writer <--> u_audio_fifo
     logic wr_full;                      // Indicates the fifo is currently full
@@ -90,7 +91,8 @@ module audio_visualiser_top #(
         .payload(payload),
         .payload_valid(payload_valid),
         .payload_last(payload_last),
-        .byte_valid(byte_valid)
+        .byte_valid(byte_valid),
+        .payload_flush(payload_flush)
     );
 
     fifo_writer u_fifo_writer (
@@ -100,6 +102,7 @@ module audio_visualiser_top #(
         .payload_valid(payload_valid),
         .payload_last(payload_last),
         .byte_valid(byte_valid),
+        .payload_flush(payload_flush),
         .wr_full(wr_full),
         .wrreq(wrreq),
         .fifo_data(fifo_data)
@@ -122,6 +125,7 @@ module audio_visualiser_top #(
         .fifo_q(fifo_q),
         .rdusedw(rdusedw),
         .sink_ready(sink_ready),
+        .payload_flush(payload_flush),
         .rdreq(rdreq),
         .sink_real(sink_real),
         .sink_valid(sink_valid),
