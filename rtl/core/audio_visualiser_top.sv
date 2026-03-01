@@ -109,6 +109,7 @@ module audio_visualiser_top #(
     );
 
     audio_fifo u_audio_fifo (
+        .aclr(payload_flush),
         .data(fifo_data),
         .rdclk(board_clk),
         .rdreq(rdreq),
