@@ -46,6 +46,7 @@ module audio_visualiser_top #(
     logic sink_sop;                     // Pulses at the start of an audio packet
     logic sink_eop;                     // Pulses at the end of an audio packet
     logic [15:0] sink_real;             // The real part of the audio we want to send to the FFT module
+    logic [1:0] sink_error;             // Tells the FFT this data is invalid
 
     // u_audio_fft <--> u_amplitude_calc
     logic source_valid;                 // Flag to indicate the FFT has sent valid output
@@ -54,12 +55,14 @@ module audio_visualiser_top #(
     logic signed [15:0] source_real;    // The real part of the frequency amplitude
     logic signed [15:0] source_imag;    // The imaginary part of the frequency amplitude
     logic [5:0] source_exp;             // The exponent of the block-floating-point representation of source
+    logic [1:0] source_error;           // Error from FFT
 
     // u_amplitude_calc <--> u_ram_writer
     logic [15:0] amplitude;             // Frequency amplitude (after exponent and logarithmic scaling)
     logic amp_valid;                    // Pulses high when 'amplitude' is ready
     logic amp_sop;                      // Aligned with frequency bin 0
     logic amp_eop;                      // Aligned with frequency bin 1023
+    logic [1:0] amp_error;              // Error from amplitude calc
 
     // u_ram_writer <--> u_amplitude_ram
     logic [15:0] data;                  // Data to write to the ram
@@ -126,6 +129,8 @@ module audio_visualiser_top #(
         .fifo_q(fifo_q),
         .rdusedw(rdusedw),
         .sink_ready(sink_ready),
+        .payload_flush(payload_flush),
+        .sink_error(sink_error),
         .rdreq(rdreq),
         .sink_real(sink_real),
         .sink_valid(sink_valid),
@@ -138,7 +143,7 @@ module audio_visualiser_top #(
 		.reset_n(resetn),
 		.sink_valid(sink_valid),
 		.sink_ready(sink_ready),
-		.sink_error(2'b0),
+		.sink_error(sink_error),
 		.sink_sop(sink_sop),
 		.sink_eop(sink_eop),
 		.sink_real(sink_real),
@@ -150,7 +155,8 @@ module audio_visualiser_top #(
 		.source_eop(source_eop),
 		.source_real(source_real),
 		.source_imag(source_imag),
-		.source_exp(source_exp)
+		.source_exp(source_exp),
+        .source_error(source_error)
 	);
 
     amplitude_calc u_amplitude_calc (
@@ -162,10 +168,12 @@ module audio_visualiser_top #(
         .source_sop(source_sop),
         .source_eop(source_eop),
         .source_exp(source_exp),
+        .source_error(source_error),
         .amplitude(amplitude),
         .amp_valid(amp_valid),
         .amp_sop(amp_sop),
-        .amp_eop(amp_eop)
+        .amp_eop(amp_eop),
+        .amp_error(amp_error)
     );
 
     ram_writer u_ram_writer (
@@ -175,6 +183,7 @@ module audio_visualiser_top #(
         .amp_valid(amp_valid),
         .amp_sop(amp_sop),
         .amp_eop(amp_eop),
+        .amp_error(amp_error),
         .data(data),
         .wraddress(wraddress),
         .wren(wren)
