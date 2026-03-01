@@ -15,7 +15,8 @@ module eth_parser #(
 
     output logic [7:0] payload,         // The payload data
     output logic payload_valid,         // Whether we are currently receiving payload data
-    output logic payload_last           // Pulses on the last byte of our payload data
+    output logic payload_last,          // Pulses on the last byte of our payload data
+    output logic payload_flush          // Tells the FIFO to drop the half-filled frame
     );
 
     frame_header frame_header_content;  // Each component of the ethernet frame header
@@ -31,6 +32,9 @@ module eth_parser #(
     logic [16:0] ip_checksum_calc;      // The calculated checksum of the IP header
     logic [31:0] ip_checksum_acc;       // 32 bits to handle overflow carries
     logic [15:0] current_word;          // Temporary holder for the 16-bit word
+    
+    logic [7:0] expected_seq;           // Tracks expected sequence ID (0x01 or 0x02)
+    logic ignore_payload;               // Indicates whether to drop incoming packet
 
     always_comb begin
         // Add any carry-over to the bottom 4 hex digits of the sum
@@ -50,13 +54,17 @@ module eth_parser #(
             payload <= 8'b0;
             payload_valid <= 1'b0;
             payload_last <= 1'b0;
+            payload_flush <= 1'b0;
             byte_counter <= 0;
             ip_checksum_acc <= 0;
+            expected_seq <= 8'h01;
+            ignore_payload <= 1'b0;
         end else if (data_valid) begin
             // If data_valid is high we are receiving an ethernet frame, progress through the states
             if (state == IDLE) begin
                 payload_valid <= 1'b0;
                 payload_last <= 1'b0;
+                payload_flush <= 1'b0;
                 byte_counter <= 0;
                 if (byte_valid) begin
                     // If we just received the SFD
@@ -194,16 +202,47 @@ module eth_parser #(
             end else if (state == PAYLOAD) begin
                 payload_valid <= 1'b1;
                 if (byte_valid) begin
-                    payload <= received_byte;
+                    if (byte_counter == 0) begin
+                        // Intercept the sequence ID byte
+                        payload_valid <= 1'b0;
+                        if (received_byte == 8'h01) begin
+                            // If we missed a 0x02, flush the first half
+                            if (expected_seq == 8'h02) begin
+                                payload_flush <= 1'b1;
+                            end
+                            expected_seq <= 8'h02;
+                            ignore_payload <= 1'b0;
+                        end else if (received_byte == 8'h02) begin
+                            if (expected_seq == 8'h02) begin
+                                expected_seq <= 8'h01;
+                                ignore_payload <= 1'b0;
+                            // If we missed a 0x01, flush this half
+                            end else begin
+                                ignore_payload <= 1'b1;
+                            end
+                        // If we got an invalid sequence ID, flush this half
+                        end else begin
+                            ignore_payload <= 1'b1;
+                        end
+                        byte_counter <= byte_counter + 1'b1;    // Move to actual payload data
+                    end else begin
+                        // Actual payload data
+                        payload_flush <= 1'b0;      // Turn off flush flag
+                        if (!ignore_payload) begin
+                            payload <= received_byte;
+                            payload_valid <= 1'b1;
+                        end else begin
+                            payload_valid <= 1'b0;
+                        end
 
-                    if (byte_counter < udp_header_content.udp_len - 16'd9) begin
-                        byte_counter <= byte_counter + 1'b1;
-                        payload_last <= 1'b0;
-                    end
-                    else if (byte_counter == udp_header_content.udp_len - 16'd9) begin
-                        byte_counter <= 0;
-                        payload_last <= 1'b1;
-                        state <= FCS;
+                        if (byte_counter < udp_header_content.udp_len - 16'd9) begin
+                            byte_counter <= byte_counter + 1'b1;
+                            payload_last <= 1'b0;
+                        end else if (byte_counter == udp_header_content.udp_len - 16'd9) begin
+                            byte_counter <= 0;
+                            payload_last <= (!ignore_payload) ? 1'b1 : 1'b0;
+                            state <= FCS;
+                        end
                     end
                 end
 
@@ -227,6 +266,7 @@ module eth_parser #(
                 state <= IDLE;
                 payload_valid <= 1'b0;
                 payload_last <= 1'b0;
+                payload_flush <= 1'b0;
                 byte_counter <= 0;
             end
         end
