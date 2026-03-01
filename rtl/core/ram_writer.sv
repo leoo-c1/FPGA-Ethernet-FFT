@@ -6,6 +6,7 @@ module ram_writer (
     input logic amp_valid,                  // Pulses high when 'amplitude' is ready
     input logic amp_sop,                    // Aligned with frequency bin 0
     input logic amp_eop,                    // Aligned with frequency bin 1023
+    input logic [1:0] amp_error,            // Error from amplitude calc
 
     output logic [15:0] data,               // Data to write to the ram
     output logic [9:0] wraddress,           // Memory address to write to in the RAM
@@ -35,7 +36,7 @@ module ram_writer (
         end else begin
             wren <= 1'b0;                   // Default to not writing
 
-            if (amp_valid) begin
+            if (amp_valid && (amp_error == 2'b00)) begin
                 if (amp_sop) begin
                     // On the first bin, reset trackers and set the first max_amp
                     displayed_bins <= 9'd0;
