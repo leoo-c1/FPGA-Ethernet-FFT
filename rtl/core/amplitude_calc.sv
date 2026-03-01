@@ -8,11 +8,13 @@ module amplitude_calc (
     input logic source_sop,                 // Start of packet (frequency bin 0)
     input logic source_eop,                 // End of packet (frequency bin 1023)
     input logic [5:0] source_exp,           // The exponent of the block-floating-point representation of source
+    input logic [1:0] source_error,         // Error from FFT
 
     output logic [15:0] amplitude,          // Frequency amplitude (after exponent and logarithmic scaling)
     output logic amp_valid,                 // Pulses high when 'amplitude' is ready
     output logic amp_sop,                   // Aligned with frequency bin 0
-    output logic amp_eop                    // Aligned with frequency bin 1023
+    output logic amp_eop,                   // Aligned with frequency bin 1023
+    output logic [1:0] amp_error            // Delayed error output
     );
 
     logic [15:0] abs_real;                  // Absolute value of the real part of the frequency amplitude
@@ -48,6 +50,12 @@ module amplitude_calc (
     logic [5:0] exp_delay_1;
     logic [5:0] exp_delay_2;
     logic [5:0] exp_delay_3;
+
+    // Delay registers for error signal
+    logic [1:0] err_delay_1;
+    logic [1:0] err_delay_2;
+    logic [1:0] err_delay_3;
+    logic [1:0] err_delay_4;
 
     logic [63:0] val_64;
     logic [31:0] val_32;
@@ -143,6 +151,11 @@ module amplitude_calc (
             exp_delay_1 <= 1'b0;
             exp_delay_2 <= 1'b0;
             exp_delay_3 <= 1'b0;
+            err_delay_1 <= 1'b0;
+            err_delay_2 <= 1'b0;
+            err_delay_3 <= 1'b0;
+            err_delay_4 <= 1'b0;
+            amp_error <= 1'b0;
         end else begin
             // Shift register (6 clock cycles) for amp_valid signal
             valid_delay_1 <= source_valid;
@@ -164,6 +177,13 @@ module amplitude_calc (
             eop_delay_3 <= eop_delay_2;
             eop_delay_4 <= eop_delay_3;
             amp_eop <= eop_delay_4;
+
+            // Shift register (5 clock cycles) to amp_error signal
+            err_delay_1 <= source_error;
+            err_delay_2 <= err_delay_1;
+            err_delay_3 <= err_delay_2;
+            err_delay_4 <= err_delay_3;
+            amp_error <= err_delay_4;
 
             // Shift register (4 clock cycles) for delayed_exp signal
             exp_delay_1 <= source_exp;
