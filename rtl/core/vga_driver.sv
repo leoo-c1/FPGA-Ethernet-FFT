@@ -1,4 +1,6 @@
-module vga_driver (
+module vga_driver #(
+    parameter bottom_margin = 150       // How many pixels to cut off from the bottom of the EQ bands
+    )(
     input logic pll_clk,                // 25.175MHz PLL clock
     input logic resetn,                 // Active low reset button
 
@@ -77,8 +79,9 @@ module vga_driver (
             if (vid_delay_3) begin
                 if (pixel_x_delay_3 >= 10'd64 && pixel_x_delay_3 < 10'd576) begin
                     if (((pixel_x_delay_3 - 10'd64) & 10'd15) < 10'd14) begin
+                        // Check if we are lower than the bars but higher than the bottom margin
                         // Measure from the bottom of the screen, use delayed pixel_y coordinate
-                        if (10'd479 - pixel_y_delay_3 < scaled_amplitude) begin
+                        if ((10'd479 - pixel_y_delay_3 < scaled_amplitude) & (10'd479 - pixel_y_delay_3 > bottom_margin)) begin
                             // Colour the bar white
                             red <= 1'b1;
                             green <= 1'b1;
