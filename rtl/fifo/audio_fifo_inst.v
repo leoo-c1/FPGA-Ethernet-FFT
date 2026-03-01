@@ -1,4 +1,5 @@
 audio_fifo	audio_fifo_inst (
+	.aclr ( aclr_sig ),
 	.data ( data_sig ),
 	.rdclk ( rdclk_sig ),
 	.rdreq ( rdreq_sig ),
