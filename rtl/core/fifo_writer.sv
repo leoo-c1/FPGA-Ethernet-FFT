@@ -11,8 +11,9 @@ module fifo_writer (
     input logic payload_valid,          // Whether we are currently receiving payload data
     input logic payload_last,           // Pulses on the last byte of our payload data
     input logic byte_valid,             // Pulses for one clock cycle on valid byte
+    input logic payload_flush,          // Tells the FIFO to drop the half-filled frame
 
-    input logic wr_full,                // Indicates the fifo is currently full
+    input logic wr_full,                // Indicates the FIFO is currently full
 
     output logic wrreq,                 // Requests a write operation when high
     output logic [15:0] fifo_data       // The data we write to the fifo
@@ -24,6 +25,13 @@ module fifo_writer (
     always_ff @ (posedge board_clk or negedge resetn) begin
         // On startup or if the reset button is pressed
         if (!resetn) begin
+            data_storage <= 8'b0;
+            chunk_count <= 1'b0;
+            wrreq <= 1'b0;
+            fifo_data <= 16'b0;
+
+        // Flush to remove the half-frame state
+        end else if (payload_flush) begin
             data_storage <= 8'b0;
             chunk_count <= 1'b0;
             wrreq <= 1'b0;
