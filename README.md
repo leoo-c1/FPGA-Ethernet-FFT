@@ -77,6 +77,8 @@ This can be done by running a command in an Admin terminal to link the FPGA's IP
 netsh interface ip add neighbors "Ethernet Interface Name" 192.0.2.146 00-1A-2B-3C-4D-5E
 ```
 
+## Project Directory
+```text
 ├── quartus/               # Quartus Prime project files and QSF constraints
 ├── audio/                 # Example .wav files to use with the visualiser
 ├── rtl/
@@ -89,3 +91,4 @@ netsh interface ip add neighbors "Ethernet Interface Name" 192.0.2.146 00-1A-2B-
 ├── tb/                    # Questa testbenches and Signal Tap setup files
 └── software/
     └── main.cpp           # C++ Transmitter GUI
+```
