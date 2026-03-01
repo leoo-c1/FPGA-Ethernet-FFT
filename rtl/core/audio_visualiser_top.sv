@@ -126,7 +126,6 @@ module audio_visualiser_top #(
         .fifo_q(fifo_q),
         .rdusedw(rdusedw),
         .sink_ready(sink_ready),
-        .payload_flush(payload_flush),
         .rdreq(rdreq),
         .sink_real(sink_real),
         .sink_valid(sink_valid),
