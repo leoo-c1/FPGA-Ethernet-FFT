@@ -19,7 +19,8 @@ module ethernet_handler #(
     output logic [7:0] payload,         // The payload data
     output logic payload_valid,         // Whether we are currently receiving payload data
     output logic payload_last,          // Pulses on the last byte of our payload data
-    output logic byte_valid             // Pulses for one clock cycle on valid byte
+    output logic byte_valid,            // Pulses for one clock cycle on valid byte
+    output logic payload_flush          // Tells the FIFO to drop the half-filled frame
     );
 
     // Delay buffers for sync time
@@ -82,7 +83,8 @@ module ethernet_handler #(
         .byte_valid(byte_valid),
         .payload(payload),
         .payload_valid(payload_valid),
-        .payload_last(payload_last)
+        .payload_last(payload_last),
+        .payload_flush(payload_flush)
     );
 
 endmodule
