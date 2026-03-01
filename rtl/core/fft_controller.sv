@@ -12,12 +12,15 @@ module fft_controller (
 
     input logic sink_ready,             // Flag from the FFT telling us it is ready to read data
 
+    input logic payload_flush,          // Indicates a corrupt packet
+
     output logic rdreq,                 // Requests a read operation when high
 
     output logic [15:0] sink_real,      // The real part of the audio we want to send to the FFT module
     output logic sink_valid,            // Requests the FFT to read our audio data
     output logic sink_sop,              // Pulses at the start of an audio packet
-    output logic sink_eop               // Pulses at the end of an audio packet
+    output logic sink_eop,              // Pulses at the end of an audio packet
+    output logic [1:0] sink_error       // Tells the FFT this data is invalid
     );
 
     typedef enum logic [1:0] {
@@ -30,6 +33,7 @@ module fft_controller (
 
     logic [9:0] word_counter = 0;       // Counts how many words we have sent to the FFT module
     logic [3:0] wait_counter = 0;       // Counts how many clock cycles we have been waiting for the FIFO to catch up
+    logic frame_error_latch;            // Tracks if the frame was truncated
 
     assign sink_real = fifo_q;
     
@@ -44,6 +48,21 @@ module fft_controller (
     
     // Read from FIFO only if we are sending valid data and the FFT is ready to take it
     assign rdreq = (state == READING) && sink_ready;
+
+    // Assert error 2'b11 to tag the frame as corrupt
+    assign sink_error = frame_error_latch ? 2'b11 : 2'b00;
+
+    // Latch the error if the FIFO is flushed while we are reading
+    always_ff @ (posedge board_clk or negedge resetn) begin
+        if (!resetn) begin
+            frame_error_latch <= 1'b0;
+        end else begin
+            if (payload_flush && state == READING)
+                frame_error_latch <= 1'b1;
+            else if (state == READING && word_counter == 10'd1023 && sink_ready)
+                frame_error_latch <= 1'b0;  // Clear latch at the end of the frame
+        end
+    end
     
     // State machine and FIFO read request
     always_ff @ (posedge board_clk or negedge resetn) begin
