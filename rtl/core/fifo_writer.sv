@@ -40,8 +40,8 @@ module fifo_writer (
         end else begin
             wrreq <= 1'b0;      // Default to low
 
-            // If we are receiving payload data and a new byte arrived
-            if (payload_valid && byte_valid) begin
+            // If we are receiving payload data
+            if (payload_valid) begin
                 // Check if this is the first 8 bits of the 16-bit group
                 if (chunk_count == 1'b0) begin
                     data_storage <= payload;    // Store the data
