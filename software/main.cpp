@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -69,6 +71,13 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     waveOutWrite(hWaveOut, &waveHeader, sizeof(WAVEHDR));
 
     const size_t FRAME_SIZE = 1024;
+    
+    // Precompute the Hann window
+    std::vector<double> hann_window(FRAME_SIZE);
+    for (size_t i = 0; i < FRAME_SIZE; ++i) {
+        hann_window[i] = 0.5 * (1.0 - std::cos(2.0 * M_PI * i / (FRAME_SIZE - 1)));
+    }
+
     size_t total_samples = audio_track.size();
     auto playback_start_time = std::chrono::steady_clock::now();
 
@@ -76,6 +85,11 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
         if (stop_requested) break;          
 
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
+
+        // Apply the Hann window to the frame
+        for (size_t j = 0; j < FRAME_SIZE; ++j) {
+            frame[j] = static_cast<int16_t>(frame[j] * hann_window[j]);
+        }
 
         auto frame_end_time = playback_start_time + std::chrono::microseconds( ((i + FRAME_SIZE) * 1000000ULL) / file_sample_rate );
 
