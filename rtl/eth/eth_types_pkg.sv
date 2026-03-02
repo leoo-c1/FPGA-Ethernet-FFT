@@ -38,7 +38,8 @@ package eth_types_pkg;
         IP_HEADER,      // Reading IP header
         UDP_HEADER,     // Reading UDP header
         PAYLOAD,        // Reading the payload data
-        FCS             // Checking the CRC
+        FCS,            // Checking the CRC
+        DROP_FRAME      // Tells parser to ignore the frame
     } eth_states;
 
 endpackage
