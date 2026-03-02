@@ -78,6 +78,9 @@ bool EthSender::sendFrame(const std::vector<int16_t>& frame_data) {
         return false;
     }
 
+    // Wait half a millisecond
+    std::this_thread::sleep_for(std::chrono::microseconds(500));
+
     // Send packet 2
     std::vector<char> packet2(total_packet_size);
     packet2[0] = 0x02;  // Sequence ID for second half
