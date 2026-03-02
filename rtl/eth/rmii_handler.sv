@@ -1,5 +1,5 @@
 module rmii_handler (
-    input logic board_clk,                // 50MHz LAN8720 clock
+    input logic clk,                    // 50MHz LAN8720 clock
     input logic resetn,                 // Reset button (active low)
 
     input logic data_valid,             // Flag to indicate we are receiving valid data
@@ -11,32 +11,47 @@ module rmii_handler (
     output logic byte_valid             // Pulses for one clock cycle on valid byte
     );
 
-    parameter max_bit_count = 8;        // We want to count a total of 8 bits
-    logic [3:0] bit_counter = 0;        // Counts how many bits we have received
+    logic [7:0] rx_shift;               // Continuous sliding window
+    logic [1:0] dibit_counter;          // Counts 0 to 3 (4 dibits = 1 byte)
+    logic locked;                       // Flags when we have found the byte boundary
 
-    logic [7:0] bit_storage;            // Holds onto each received bit until full byte is received
-
-    always_ff @ (posedge board_clk or negedge resetn) begin
-        if (!resetn) begin              // On reset/startup, reset our collected byte
+    always_ff @ (posedge clk or negedge resetn) begin
+        if (!resetn) begin
             received_byte <= 8'b0;
             byte_valid <= 1'b0;
-            bit_counter <= 4'b0;
-            bit_storage <= 8'b0;
+            rx_shift <= 8'b0;
+            dibit_counter <= 2'b0;
+            locked <= 1'b0;
         end else begin
-            if (data_valid) begin       // If we are receiving valid data
-                if (bit_counter < max_bit_count - 2) begin
-                    bit_storage[bit_counter +: 2] <= {rx1, rx0};
-                    bit_counter <= bit_counter + 2'd2;
-                    byte_valid <= 1'b0;
-                end else begin
-                    received_byte <= {rx1, rx0, bit_storage[5:0]};
-                    byte_valid <= 1'b1;
-                    bit_counter <= 0;
-                end
+            if (data_valid) begin
+                // Continuously shift the new dibit in (RMII sends LSB first, so shift right)
+                rx_shift <= {rx1, rx0, rx_shift[7:2]};
 
-            end else begin              // If we aren't receiving valid data
-                bit_counter <= 0;
+                if (!locked) begin
+                    byte_valid <= 1'b0;
+                    
+                    // Look for the exact SFD alignment (0xD5)
+                    if ({rx1, rx0, rx_shift[7:2]} == 8'hD5) begin
+                        locked <= 1'b1;           // Boundary locked!
+                        received_byte <= 8'hD5;   // Output the SFD
+                        byte_valid <= 1'b1;       // Tell parser we have a valid byte
+                        dibit_counter <= 2'b0;    // Reset the 4-clock counter
+                    end
+                end else begin
+                    // We are locked. Safely count 4 clock cycles per byte.
+                    dibit_counter <= dibit_counter + 2'd1;
+                    if (dibit_counter == 2'd3) begin
+                        received_byte <= {rx1, rx0, rx_shift[7:2]};
+                        byte_valid <= 1'b1;
+                    end else begin
+                        byte_valid <= 1'b0;
+                    end
+                end
+            end else begin
+                // The physical packet ended. Drop the lock and reset.
+                locked <= 1'b0;
                 byte_valid <= 1'b0;
+                dibit_counter <= 2'b0;
             end
         end
     end
