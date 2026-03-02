@@ -57,12 +57,13 @@ module ethernet_handler #(
         end
     end
 
-    logic [7:0] received_byte;          // The 8-bit data made by combining both data pins' inputs
+    // The 8-bit data made by combining both data pins' inputs
+    (* keep *) logic [7:0] received_byte;          
 
     assign tx_en = 1'b0;
 
     rmii_handler byte_receiver (
-        .board_clk(board_clk),
+        .clk(board_clk),
         .resetn(resetn),
         .data_valid(dv_sync2),
         .rx0(rx0_sync2),
@@ -76,7 +77,7 @@ module ethernet_handler #(
         .FPGA_IP(FPGA_IP),
         .FPGA_PORT(FPGA_PORT)
     ) ethernet_parser (
-        .board_clk(board_clk),
+        .clk(board_clk),
         .resetn(resetn),
         .data_valid(dv_sync2),
         .received_byte(received_byte),
