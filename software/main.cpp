@@ -73,19 +73,18 @@ void AudioStreamingTask(std::string wav_file_path, std::string fpga_ip, int fpga
     auto playback_start_time = std::chrono::steady_clock::now();
 
     for (size_t i = 0; i + FRAME_SIZE <= total_samples; i += FRAME_SIZE) {
-        if (stop_requested) break;          // Exit loop immediately if STOP is clicked
+        if (stop_requested) break;          
 
         std::vector<int16_t> frame(audio_track.begin() + i, audio_track.begin() + i + FRAME_SIZE);
 
         auto frame_end_time = playback_start_time + std::chrono::microseconds( ((i + FRAME_SIZE) * 1000000ULL) / file_sample_rate );
-        auto blast_end_time = frame_end_time - std::chrono::microseconds(1000);
 
-        while (std::chrono::steady_clock::now() < blast_end_time) {
-            if (stop_requested) break;
-            sender.sendFrame(frame);
-        }
+        // Send the frame once
+        sender.sendFrame(frame);
 
         if (stop_requested) break;
+        
+        // Wait until it is time for the next audio frame
         std::this_thread::sleep_until(frame_end_time);
     }
     
