@@ -68,6 +68,7 @@ module amplitude_calc (
 
     logic [63:0] normalized_val;
     logic [3:0] frac_bits;
+    logic [15:0] raw_log;
 
     always_comb begin
         val_64 = {24'b0, raw_amplitude};    // Pad to 64
@@ -126,6 +127,9 @@ module amplitude_calc (
         // Extract the 4 fractional bits
         normalized_val = val_64 << (6'd63 - log_index);
         frac_bits = normalized_val[62:59];
+        
+        // Build the raw logarithm value
+        raw_log = {6'b0, log_index, frac_bits};
     end
 
     always_ff @ (posedge board_clk or negedge resetn) begin
@@ -225,8 +229,10 @@ module amplitude_calc (
             else
                 raw_amplitude <= base_amplitude >> delayed_exp;
 
-            // Combine integer and fractional parts
-            amplitude <= {6'b0, log_index, frac_bits};
+            if (raw_log > 16'd200)
+                amplitude <= (raw_log - 16'd200) << 1; 
+            else
+                amplitude <= 16'd0;
         end
     end
 
