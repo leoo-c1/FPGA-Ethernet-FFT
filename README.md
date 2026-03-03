@@ -49,6 +49,7 @@ The project runs on the Intel Cyclone IV EP4CE6E22C8N FPGA using the RZ-EasyFPGA
 * FPGA Development Board: [RZ-EasyFPGA A2.2 / RZ-EP4CE6-WX board](https://web.archive.org/web/20210128152708/http://rzrd.net/product/?79_502.html)
 * Ethernet PHY: [LAN8720 PHY Module](https://www.ebay.com.au/itm/233326770234)
 * Ethernet Adaptor: [ALOGIC Ultra Mini USB-C to Ethernet Adapter](https://www.jbhifi.com.au/products/alogic-ultra-mini-usb-c-to-ethernet-adapter)
+* VGA-to-HDMI Adapter: [eBay Listing](https://www.ebay.com.au/itm/302905294205)
 
 ### Pinout Configuration
 
