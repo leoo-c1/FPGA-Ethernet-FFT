@@ -2,7 +2,10 @@ module audio_visualiser_top #(
     parameter FPGA_MAC = 48'h00_1A_2B_3C_4D_5E, // FPGA's MAC address
     parameter FPGA_IP = 32'hC0_00_02_92,        // FPGA's IP address of 192.0.2.146 (theoretical)
     parameter FPGA_PORT = 16'd5005,             // FPGA's UDP port
-    parameter bottom_margin = 150               // How many pixels to cut off from the bottom of the EQ bands
+
+    parameter bottom_margin = 150,      // How many pixels to cut off from the bottom of the EQ bands
+    parameter amplitude_shift = 50,     // How far down towards the margin the amplitude gets shifted
+    parameter eq_scale = 80             // How much to scale the EQ bars (this gets divided by 64)
     )(
     input logic phy_clk,                // 50MHz LAN8720 clock
     input logic board_clk,              // 50MHz FPGA onboard clock
@@ -211,7 +214,9 @@ module audio_visualiser_top #(
     );
 
     vga_driver #(
-        .bottom_margin(bottom_margin)
+        .bottom_margin(bottom_margin),
+        .amplitude_shift(amplitude_shift),
+        .eq_scale(eq_scale)
     ) u_vga_driver (
         .pll_clk(pll_clk),
         .resetn(resetn),
