@@ -2,11 +2,10 @@
 fft/** linguist-generated=true
 fifo/** linguist-generated=true
 *.vhd linguist-generated=true
-
 # Ignore the questa files in language statistics
 tb/sim/** linguist-generated=true
 tb/sim/**/* linguist-generated=true
-
 # Ignore the FFT IP simulation files in language statistics
 rtl/fft/audio_fft/simulation/** linguist-generated=true
 rtl/fft/audio_fft/simulation/**/* linguist-generated=true
+media filter=lfs diff=lfs merge=lfs -text
