@@ -9,6 +9,8 @@
 
 **A 32-band audio frequency visualiser built on an FPGA. It receives audio over Ethernet, processes it using a 1024-point FFT, and logarithmically maps the frequencies to a VGA display.**
 
+https://github.com/user-attachments/assets/8b688af6-d99d-4f4f-9ccb-69480a7465fb
+
 </div>
 
 ## Overview
