@@ -81,10 +81,17 @@ module vga_driver #(
             if (vid_delay_3) begin
                 if (pixel_x_delay_3 >= 10'd64 && pixel_x_delay_3 < 10'd576) begin
                     if (((pixel_x_delay_3 - 10'd64) & 10'd15) < 10'd14) begin
-                        // Apply eq bar transformations
+                        // Apply eq bar transformations, first make sure transform won't create negative amplitude
                         // Measure from the bottom of the screen, use delayed pixel_y coordinate
-                        if ((10'd479 - pixel_y_delay_3 < (eq_scale * (scaled_amplitude - amplitude_shift)) >> 6)
-                            & (10'd479 - pixel_y_delay_3 > bottom_margin)) begin
+                        if (scaled_amplitude <= amplitude_shift) begin
+                            // Amplitude is supposed to be cut off, don't show it
+                            red <= 1'b0;
+                            green <= 1'b0;
+                            blue <= 1'b0;
+
+                        // Measure from the bottom of the screen, use delayed pixel_y coordinate
+                        end else if ((10'd479 - pixel_y_delay_3 < (eq_scale * (scaled_amplitude - amplitude_shift)) >> 6)
+                                    & (10'd479 - pixel_y_delay_3 > bottom_margin)) begin
                             // Colour the bar white
                             red <= 1'b1;
                             green <= 1'b1;
